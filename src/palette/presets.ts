@@ -1,6 +1,30 @@
 import type { Palette } from './types'
 
+/**
+ * Pinned first, always, in every palette list (spec: "the first two palettes always"). They're built-in
+ * like the rest of PALETTE_PRESETS — not editable/deletable in the Palette Manager, same as any other
+ * curated preset — but their position at index 0/1 is never disturbed by reordering.
+ */
+export const PRIDE_PALETTE: Palette = {
+  id: 'pride',
+  name: 'Pride',
+  colors: ['#E40303', '#FF8C00', '#FFED00', '#008026', '#004DFF', '#732982'],
+  background: '#ffffff',
+}
+
+export const TRANS_PALETTE: Palette = {
+  id: 'trans',
+  name: 'Trans Pride',
+  colors: ['#5BCEFA', '#F5A9B8', '#FFFFFF'],
+  background: '#fdfdfd',
+}
+
+/** Palette IDs that are pinned to the front and can never be reordered, edited, or deleted. */
+export const PINNED_PALETTE_IDS = [PRIDE_PALETTE.id, TRANS_PALETTE.id]
+
 export const PALETTE_PRESETS: Palette[] = [
+  PRIDE_PALETTE,
+  TRANS_PALETTE,
   { id: 'sunset', name: 'Sunset', colors: ['#ff6b4a', '#ff9f6e', '#ffd08a', '#7c3aed'], background: '#fff7ed' },
   { id: 'acid', name: 'Acid Grid', colors: ['#ccff00', '#ff00aa', '#00e0ff', '#111111'], background: '#f5f5f0' },
   { id: 'paper', name: 'Paper Cut', colors: ['#e8e2d4', '#c9b896', '#8a6d4b', '#3f3226'], background: '#f7f4ec' },

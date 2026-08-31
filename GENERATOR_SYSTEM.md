@@ -35,11 +35,14 @@ same `GeneratedDesign`.
 Generators compose from a small primitive set (`engine/shapes.ts`): `circle, rect, polygon, star, line, path,
 blob, arc, ring`. Each primitive serializes to real SVG so output stays editable vector, never rasterized.
 
-## MVP generators (Phase 1 + 2)
+## Generators (14)
 
-Dot Field, Grid, Circles, Waves, Blobs, Polygon Field, Concentric Lines, Flow Lines, Checker/Tile, Confetti —
-10 generators spanning geometric, organic, lines, and experimental categories, validating the architecture
-before scaling toward 30-50 generators.
+Geometric: Dot Field, Grid, Circles, Polygon Field, Checker/Tile, Hex Grid.
+Lines: Waves, Concentric Lines, Flow Lines, Spiral.
+Organic: Blobs, Mandala.
+Experimental: Confetti, Halftone.
+
+14 generators spanning all four categories, validating the architecture before scaling toward 30-50.
 
 ## Mutation & evolution
 

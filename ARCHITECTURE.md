@@ -22,7 +22,8 @@ engine/        Framework-independent generative core. No React imports.
 
 generators/     Individual GeneratorDefinition implementations (dotField, grid, circles, waves, blobs, ...)
 
-palette/        Palette engine: presets, harmony generation, palette <-> design binding
+palette/        Palette engine: built-in presets (Pride and Trans Pride always pinned first — see
+                PINNED_PALETTE_IDS), harmony generation, palette <-> design binding
 
 composition/    Poster/hero/social composition engine: canvas + layout presets, fit/clip/focal transform math,
                 text-safe-zone + text-layer rendering — all pure functions, no React (mirrors engine/)
@@ -87,6 +88,17 @@ that region gets a translucent scrim (in the background color, for legibility) p
 this keeps text readable and genuinely editable when pasted into Figma, but it does not yet feed back into the
 generator to literally thin out the pattern under the text (that would require generators to accept a density
 mask, noted as a future improvement rather than implemented now).
+
+## Palettes
+
+`PALETTE_PRESETS` (`palette/presets.ts`) is the built-in list, read-only in the UI. Pride and Trans Pride are
+defined first in that array and are never reordered, edited, or deleted — `PINNED_PALETTE_IDS` marks them so
+the Palette Manager can enforce it. User-created palettes live separately in `useCustomPaletteStore`
+(localStorage, same shape/pattern as `useSavedStore`). `palette/allPalettes.ts` merges the two
+(`useAllPalettes()` for components, `getAllPalettes()` for non-reactive use in store actions like
+`randomizeNew`) so custom palettes are just as eligible for randomization as built-ins, while always sorting
+after them. The Palette Manager (`components/controls/PaletteManagerModal.tsx`) is the only place that
+mutates `useCustomPaletteStore` — create, edit, delete, reorder — built-ins render there too but read-only.
 
 ## Extensibility
 

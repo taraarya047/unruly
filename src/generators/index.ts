@@ -9,6 +9,10 @@ import { concentricGenerator } from './concentric'
 import { flowLinesGenerator } from './flowLines'
 import { checkerGenerator } from './checker'
 import { confettiGenerator } from './confetti'
+import { spiralGenerator } from './spiral'
+import { hexGridGenerator } from './hexGrid'
+import { halftoneGenerator } from './halftone'
+import { mandalaGenerator } from './mandala'
 
 const ALL_GENERATORS = [
   dotFieldGenerator,
@@ -21,6 +25,10 @@ const ALL_GENERATORS = [
   flowLinesGenerator,
   checkerGenerator,
   confettiGenerator,
+  spiralGenerator,
+  hexGridGenerator,
+  halftoneGenerator,
+  mandalaGenerator,
 ]
 
 export function registerGenerators() {
@@ -41,4 +49,8 @@ export {
   flowLinesGenerator,
   checkerGenerator,
   confettiGenerator,
+  spiralGenerator,
+  hexGridGenerator,
+  halftoneGenerator,
+  mandalaGenerator,
 }

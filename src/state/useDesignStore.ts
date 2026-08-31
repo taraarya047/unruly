@@ -8,7 +8,8 @@ import { applySemanticAction, type SemanticAction } from '@/engine/mutate'
 import { generateVariations } from '@/engine/evolve'
 import { randomizeParameters } from '@/engine/randomizeParams'
 import { defaultLayerState, type LayerState } from '@/engine/composeLayers'
-import { DEFAULT_PALETTE, PALETTE_PRESETS } from '@/palette/presets'
+import { DEFAULT_PALETTE } from '@/palette/presets'
+import { getAllPalettes } from '@/palette/allPalettes'
 import { generateHarmonyPalette } from '@/palette/harmony'
 import type { DesignPreset } from '@/presets/designPresets'
 
@@ -177,7 +178,7 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
         const baseParams = generatorId === state.generatorId ? state.parameters : generator.defaultParameters
         const parameters = randomizeParameters(generator.parameterSchema, baseParams, groups, rng)
         const seed = state.locks.geometry ? state.seed : randomSeed()
-        const palette = state.locks.palette ? state.palette : rng.pick(PALETTE_PRESETS)
+        const palette = state.locks.palette ? state.palette : rng.pick(getAllPalettes())
         const snapshot: DesignSnapshot = { generatorId, parameters, seed, palette, layers: state.layers }
         return { ...snapshot, ...pushHistory(state, snapshot) }
       })

@@ -10,13 +10,14 @@ function isTypingTarget(el: EventTarget | null) {
   return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (el as HTMLElement)?.isContentEditable
 }
 
-/** Global playground shortcuts — see spec §51. Skipped while typing in a field. */
+/** Global playground shortcuts — see spec §51. Skipped while typing in a field or while any modal/sheet is open. */
 export function useKeyboardShortcuts(enabled: boolean) {
   useEffect(() => {
     if (!enabled) return
 
     function onKeyDown(e: KeyboardEvent) {
       if (isTypingTarget(e.target)) return
+      if (document.querySelector('[role="dialog"]')) return
       const mod = e.metaKey || e.ctrlKey
       const store = useDesignStore.getState()
 
