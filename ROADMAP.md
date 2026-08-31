@@ -71,4 +71,19 @@
       expensive field/produced excessive shape counts (fixed via `sampleGrid`/`marchingSquaresFromGrid` reuse
       and a raised `tileSize` minimum, respectively).
 
+- [x] **Stacked generator layers** (user-requested, outside the original phase plan): designs can now
+      composite multiple independent generators — `state/useDesignStore.ts` gained a `generatorLayers`
+      array (`{ generatorId, parameters, seed, opacity, blendMode, visible }` each), rendered on top of
+      the base design via CSS `mix-blend-mode` (16 modes) with `isolation:isolate`, managed through a new
+      Generator Layers panel (add/remove/reorder/randomize/opacity/blend mode per layer). "Surprise me"
+      was renamed "Shuffle" and now rerolls the base design and every stacked layer's generator/params/
+      seed independently rather than just the base; a new "Surprise me" mode rebuilds the whole layer
+      stack from scratch (how many layers, which generators), with a "Chaos blending" toggle that also
+      wildly randomizes every layer's opacity/blend mode instead of the tasteful default range. Persists
+      through save/load, share links, and JSON import/export. Found and fixed a real bug during
+      integration: the pre-existing "Shape layers" panel (per-generator sub-layer visibility/opacity)
+      was picking up these new stacked layers too, but its opacity slider for them was a dead end —
+      overrides are applied before the stacked layers are composited onto the design, so the control
+      looked live but silently did nothing; fixed by excluding stacked-layer ids from that panel.
+
 See per-phase "what shipped" notes in commit history and end-of-phase reports.

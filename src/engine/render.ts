@@ -19,7 +19,10 @@ export function renderDesignInner(design: GeneratedDesign): string {
     .filter((layer) => layer.visible)
     .map((layer) => {
       const shapesMarkup = layer.shapes.map((s) => primitiveMarkup(s.shape, styleAttrs(s))).join('')
-      return `<g id="${layer.id}" data-layer-name="${layer.name}" opacity="${layer.opacity}">${shapesMarkup}</g>`
+      // isolation:isolate keeps a layer's own overlapping shapes compositing normally against each
+      // other — mix-blend-mode only kicks in once, against whatever is stacked underneath the layer.
+      const blendStyle = layer.blendMode && layer.blendMode !== 'normal' ? ` style="mix-blend-mode:${layer.blendMode};isolation:isolate"` : ''
+      return `<g id="${layer.id}" data-layer-name="${layer.name}" opacity="${layer.opacity}"${blendStyle}>${shapesMarkup}</g>`
     })
     .join('')
 }

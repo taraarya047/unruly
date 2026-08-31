@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { generatorRegistry } from '@/engine/registry'
 import { renderDesignToSvgString } from '@/engine/render'
 import { composeLayers, defaultLayerState } from '@/engine/composeLayers'
+import { mergeGeneratorLayers } from '@/engine/composeGeneratorLayers'
 import { useSavedStore, type SavedDesign } from '@/state/useSavedStore'
 import { useDesignStore } from '@/state/useDesignStore'
 import { serializeDesignFile, parseDesignFile } from '@/export/designFile'
@@ -148,7 +149,8 @@ function SavedCard({ design }: { design: SavedDesign }) {
     if (!generator) return ''
     const rendered = generator.generate(design.parameters, design.seed, design.palette.colors)
     const composed = composeLayers(rendered, design.palette, design.layers ?? defaultLayerState())
-    return renderDesignToSvgString(composed, { includeMetadata: false, sizeMode: 'fill' })
+    const layered = mergeGeneratorLayers(composed, design.generatorLayers ?? [], design.palette)
+    return renderDesignToSvgString(layered, { includeMetadata: false, sizeMode: 'fill' })
   }, [generator, design])
 
   const open = () => {
@@ -158,6 +160,7 @@ function SavedCard({ design }: { design: SavedDesign }) {
       seed: design.seed,
       palette: design.palette,
       layers: design.layers ?? defaultLayerState(),
+      generatorLayers: design.generatorLayers ?? [],
     })
     navigate('/playground')
   }

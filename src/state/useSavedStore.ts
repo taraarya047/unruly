@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { GeneratorParameters } from '@/engine/types'
 import type { Palette } from '@/palette/types'
 import type { LayerState } from '@/engine/composeLayers'
+import type { GeneratorLayerConfig } from './useDesignStore'
 
 export interface SavedDesign {
   id: string
@@ -12,6 +13,8 @@ export interface SavedDesign {
   palette: Palette
   /** Optional for backward compatibility with designs saved before the layer system existed. */
   layers?: LayerState
+  /** Optional for backward compatibility with designs saved before stacked generator layers existed. */
+  generatorLayers?: GeneratorLayerConfig[]
   /** Optional for backward compatibility with designs saved before tags existed. */
   tags?: string[]
   createdAt: number

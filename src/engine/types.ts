@@ -71,6 +71,28 @@ export interface StyledShape {
   opacity?: number
 }
 
+// CSS mix-blend-mode values usable on an SVG <g> — the vocabulary for stacked generator layers.
+export const BLEND_MODES = [
+  'normal',
+  'multiply',
+  'screen',
+  'overlay',
+  'darken',
+  'lighten',
+  'color-dodge',
+  'color-burn',
+  'hard-light',
+  'soft-light',
+  'difference',
+  'exclusion',
+  'hue',
+  'saturation',
+  'color',
+  'luminosity',
+] as const
+
+export type BlendMode = (typeof BLEND_MODES)[number]
+
 export interface SVGLayer {
   id: string
   name: string
@@ -78,6 +100,8 @@ export interface SVGLayer {
   locked: boolean
   opacity: number
   shapes: StyledShape[]
+  /** Defaults to 'normal' (plain alpha compositing) when omitted. */
+  blendMode?: BlendMode
 }
 
 export interface DesignMetadata {

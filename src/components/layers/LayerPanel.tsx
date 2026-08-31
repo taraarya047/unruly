@@ -12,6 +12,7 @@ export function LayerPanel() {
   // new object identity on every call — that would make zustand think the store changed on
   // every render and loop forever (React's "Maximum update depth exceeded").
   const extraLayers = useDesignStore((s) => s.layers.extraLayers)
+  const generatorLayers = useDesignStore((s) => s.generatorLayers)
   const toggleLayerVisible = useDesignStore((s) => s.toggleLayerVisible)
   const toggleLayerLocked = useDesignStore((s) => s.toggleLayerLocked)
   const setLayerOpacity = useDesignStore((s) => s.setLayerOpacity)
@@ -20,8 +21,15 @@ export function LayerPanel() {
   const deleteExtraLayer = useDesignStore((s) => s.deleteExtraLayer)
   const setLayerOrder = useDesignStore((s) => s.setLayerOrder)
 
-  const ids = design.layers.map((l) => l.id)
-  const frontToBack = [...design.layers].reverse()
+  // Stacked generator layers (see GeneratorLayersPanel) are appended to design.layers for rendering,
+  // but they're composited after composeLayers runs — an opacity/visibility override set here would be
+  // silently dropped before it ever reaches them. They have their own dedicated controls, so exclude
+  // them from this panel entirely rather than showing a control that looks live but does nothing.
+  const generatorLayerIds = new Set(generatorLayers.map((l) => l.id))
+  const shapeLayers = design.layers.filter((l) => !generatorLayerIds.has(l.id))
+
+  const ids = shapeLayers.map((l) => l.id)
+  const frontToBack = [...shapeLayers].reverse()
 
   const move = (id: string, direction: 'up' | 'down') => {
     const idx = ids.indexOf(id)

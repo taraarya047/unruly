@@ -1,7 +1,8 @@
 import { useDesignStore, type Locks } from '@/state/useDesignStore'
 import { Button } from '@/components/ui/Button'
 import { IconButton } from '@/components/ui/IconButton'
-import { SparkleIcon, LockIcon, UnlockIcon, UndoIcon, RedoIcon } from '@/components/ui/icons'
+import { Toggle } from '@/components/ui/Toggle'
+import { SparkleIcon, ShuffleIcon, LockIcon, UnlockIcon, UndoIcon, RedoIcon } from '@/components/ui/icons'
 import { EvolutionPicker } from './EvolutionPicker'
 
 const LOCK_LABELS: { key: keyof Locks; label: string }[] = [
@@ -18,6 +19,9 @@ export function MagicBar() {
   const randomizeRemix = useDesignStore((s) => s.randomizeRemix)
   const randomizeRecolor = useDesignStore((s) => s.randomizeRecolor)
   const randomizeDistort = useDesignStore((s) => s.randomizeDistort)
+  const randomizeComposition = useDesignStore((s) => s.randomizeComposition)
+  const chaosBlending = useDesignStore((s) => s.chaosBlending)
+  const toggleChaosBlending = useDesignStore((s) => s.toggleChaosBlending)
   const undo = useDesignStore((s) => s.undo)
   const redo = useDesignStore((s) => s.redo)
   const canUndo = useDesignStore((s) => s.canUndo())
@@ -25,8 +29,8 @@ export function MagicBar() {
 
   return (
     <div className="space-y-2.5">
-      <Button variant="primary" size="lg" className="w-full" icon={<SparkleIcon width={18} height={18} />} onClick={randomizeNew}>
-        Surprise me
+      <Button variant="primary" size="lg" className="w-full" icon={<ShuffleIcon width={18} height={18} />} onClick={randomizeNew}>
+        Shuffle
       </Button>
       <div className="grid grid-cols-2 gap-1.5">
         <EvolutionPicker />
@@ -40,6 +44,17 @@ export function MagicBar() {
           Distort
         </Button>
       </div>
+
+      <div className="rounded-xl border border-border bg-control-bg/40 p-2.5">
+        <Button variant="secondary" size="sm" className="w-full" icon={<SparkleIcon width={15} height={15} />} onClick={randomizeComposition}>
+          Surprise me
+        </Button>
+        <label className="mt-2 flex items-center justify-between">
+          <span className="text-xs text-text-muted">Chaos blending (random opacity &amp; blend modes)</span>
+          <Toggle checked={chaosBlending} onChange={toggleChaosBlending} />
+        </label>
+      </div>
+
       <div className="flex items-center justify-center gap-1.5">
         <IconButton label="Previous design (⌘Z)" onClick={undo} disabled={!canUndo}>
           <UndoIcon width={16} height={16} />

@@ -5,6 +5,7 @@ import { MagicBar } from './MagicBar'
 import { ParamControl } from './ParamControl'
 import { PaletteControls } from './PaletteControls'
 import { LayerPanel } from '@/components/layers/LayerPanel'
+import { GeneratorLayersPanel } from '@/components/layers/GeneratorLayersPanel'
 import { SEMANTIC_ACTIONS } from '@/engine/mutate'
 import { Toggle } from '@/components/ui/Toggle'
 import { randomSeed } from '@/engine/prng'
@@ -112,7 +113,14 @@ export function ControlPanel() {
       <div className="h-px bg-border" />
 
       <div>
-        <div className="mb-2 text-xs font-medium text-text-muted">Layers</div>
+        <div className="mb-2 text-xs font-medium text-text-muted">Generator layers</div>
+        <GeneratorLayersPanel />
+      </div>
+
+      <div className="h-px bg-border" />
+
+      <div>
+        <div className="mb-2 text-xs font-medium text-text-muted">Shape layers</div>
         <LayerPanel />
       </div>
     </div>

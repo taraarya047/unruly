@@ -89,6 +89,26 @@ seed by nudging the RNG stream and/or parameters, for the Evolve / design-tree i
 `state/useDesignStore.ts` maps each of the four locks (Geometry / Composition / Texture / Palette) to a set of
 `ParamGroup`s (`engine/randomizeParams.ts` does the actual per-group reroll/nudge): Geometry owns `shape` (plus
 the generator identity and seed), Composition owns `pattern` + `composition`, Texture owns `variation`, and
-Palette owns `color` (plus the palette itself). "Surprise me" and "Evolve" reroll only the groups not covered
-by an active lock; "Remix", "Recolor", and "Distort" are direct single-purpose actions that always act on their
-target regardless of locks.
+Palette owns `color` (plus the palette itself). "Shuffle" and "Evolve" reroll only the groups not covered
+by an active lock; "Remix", "Recolor", "Distort", and "Surprise me" are direct single-purpose actions that
+always act on their target regardless of locks.
+
+## Stacked generator layers
+
+A design isn't limited to one generator: `state/useDesignStore.ts` holds an optional `generatorLayers:
+GeneratorLayerConfig[]` array — each entry its own `{ generatorId, parameters, seed, opacity, blendMode,
+visible }`, composited on top of the base design via CSS `mix-blend-mode` (`BLEND_MODES` in `engine/types.ts`)
+with `isolation:isolate` so a layer's own shapes composite normally before blending, once, against whatever is
+stacked beneath it. `engine/composeGeneratorLayers.ts` runs each layer's generator and flattens its output into
+a single `SVGLayer`; `useCurrentDesign` appends these after the base's own `composeLayers()` pass, so the
+existing single-render-path renderer (`renderDesignInner`) needed only a `blendMode` field on `SVGLayer`, not a
+parallel rendering path. The pre-existing per-generator "Shape layers" panel (`components/layers/LayerPanel.tsx`)
+explicitly excludes these merged layers — their opacity/visibility live in `generatorLayers`, not in
+`layers.overrides`, so a control bound to the wrong id would silently do nothing.
+
+"Shuffle" (formerly "Surprise me") rerolls the base design and every stacked layer's generator/params/seed
+independently — one reroll pass per layer, respecting locks the same way the base always has — without
+touching the stack itself (layer count, opacity, blend mode). "Surprise me" (the new mode) is the inverse: a
+direct action, like Remix, that rebuilds the whole stack from scratch — how many layers, which generators, and
+(when the "Chaos blending" toggle is on) wildly randomized opacity/blend mode per layer rather than the tasteful
+default range.

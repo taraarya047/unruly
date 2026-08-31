@@ -26,6 +26,7 @@ export function Header() {
   const seed = useDesignStore((s) => s.seed)
   const palette = useDesignStore((s) => s.palette)
   const layers = useDesignStore((s) => s.layers)
+  const generatorLayers = useDesignStore((s) => s.generatorLayers)
 
   const resolvedTheme = useThemeStore((s) => s.resolved)
   const setPreference = useThemeStore((s) => s.setPreference)
@@ -37,12 +38,12 @@ export function Header() {
   const generator = generatorRegistry.get(generatorId)
 
   const handleSave = () => {
-    save({ name: generator?.name ?? 'Design', generatorId, parameters, seed, palette, layers })
+    save({ name: generator?.name ?? 'Design', generatorId, parameters, seed, palette, layers, generatorLayers })
     show('Saved to your library')
   }
 
   const handleCopyLink = async () => {
-    const url = buildShareUrl(generatorId, parameters, seed, palette)
+    const url = buildShareUrl(generatorId, parameters, seed, palette, generatorLayers)
     await navigator.clipboard.writeText(url)
     show('Link copied — anyone who opens it sees this exact design')
   }

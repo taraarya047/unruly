@@ -11,6 +11,7 @@ interface DesignFilePayload {
   seed: number
   palette: SavedDesign['palette']
   layers?: SavedDesign['layers']
+  generatorLayers?: SavedDesign['generatorLayers']
   tags?: string[]
 }
 
@@ -23,6 +24,7 @@ export function serializeDesignFile(design: SavedDesign): string {
     seed: design.seed,
     palette: design.palette,
     layers: design.layers,
+    generatorLayers: design.generatorLayers,
     tags: design.tags,
   }
   return JSON.stringify(payload, null, 2)
@@ -53,6 +55,7 @@ export function parseDesignFile(text: string): ParsedDesignFile | null {
     seed: payload.seed,
     palette: payload.palette,
     layers: payload.layers,
+    generatorLayers: Array.isArray(payload.generatorLayers) ? payload.generatorLayers : undefined,
     tags: Array.isArray(payload.tags) ? payload.tags.filter((t): t is string => typeof t === 'string') : undefined,
   }
 }

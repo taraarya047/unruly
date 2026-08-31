@@ -29,6 +29,7 @@ export function Playground() {
       seed: shared.seed,
       palette: shared.palette,
       layers: defaultLayerState(),
+      generatorLayers: shared.generatorLayers,
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
