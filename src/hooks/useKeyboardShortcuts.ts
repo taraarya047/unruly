@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useDesignStore } from '@/state/useDesignStore'
 import { useSavedStore } from '@/state/useSavedStore'
 import { useToastStore } from '@/state/useToastStore'
+import { useUIStore } from '@/state/useUIStore'
 import { generatorRegistry } from '@/engine/registry'
 
 function isTypingTarget(el: EventTarget | null) {
@@ -63,6 +64,9 @@ export function useKeyboardShortcuts(enabled: boolean) {
           break
         case '0':
           window.dispatchEvent(new CustomEvent('playground:fit'))
+          break
+        case '?':
+          useUIStore.getState().setShortcutsOpen(true)
           break
       }
     }

@@ -7,6 +7,7 @@ import { generatorRegistry } from '@/engine/registry'
 import { IconButton } from '@/components/ui/IconButton'
 import { ExportMenu } from '@/components/export/ExportMenu'
 import { UndoIcon, RedoIcon, SaveIcon, SunIcon, MoonIcon, HelpIcon } from '@/components/ui/icons'
+import { useUIStore } from '@/state/useUIStore'
 import { useToastStore } from '@/state/useToastStore'
 import clsx from 'clsx'
 
@@ -27,6 +28,7 @@ export function Header() {
   const setPreference = useThemeStore((s) => s.setPreference)
   const save = useSavedStore((s) => s.save)
   const show = useToastStore((s) => s.show)
+  const setShortcutsOpen = useUIStore((s) => s.setShortcutsOpen)
 
   const design = useCurrentDesign()
   const generator = generatorRegistry.get(generatorId)
@@ -79,7 +81,7 @@ export function Header() {
         >
           {resolvedTheme === 'dark' ? <SunIcon /> : <MoonIcon />}
         </IconButton>
-        <IconButton label="Help & shortcuts" onClick={() => show('Press ? for keyboard shortcuts')}>
+        <IconButton label="Help & shortcuts" onClick={() => setShortcutsOpen(true)}>
           <HelpIcon />
         </IconButton>
         {isPlayground && (

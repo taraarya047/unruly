@@ -1,6 +1,7 @@
 import { generatorRegistry } from '@/engine/registry'
 import { useDesignStore } from '@/state/useDesignStore'
 import { GeneratorCard } from './GeneratorCard'
+import { PresetStrip } from './PresetStrip'
 
 const CATEGORY_LABELS: Record<string, string> = {
   geometric: 'Geometric',
@@ -17,6 +18,11 @@ export function GeneratorLibrary() {
 
   return (
     <div className="flex h-full flex-col overflow-y-auto p-3">
+      <h2 className="px-1.5 pb-2 pt-1 text-xs font-semibold uppercase tracking-wider text-text-muted">Presets</h2>
+      <div className="mb-4">
+        <PresetStrip />
+      </div>
+
       <h2 className="px-1.5 pb-2 pt-1 text-xs font-semibold uppercase tracking-wider text-text-muted">Generators</h2>
       {categories.map((cat) => (
         <div key={cat} className="mb-3">

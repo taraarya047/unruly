@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import { Header } from './Header'
 import { Toaster } from '@/components/ui/Toaster'
+import { ShortcutsModal } from '@/components/help/ShortcutsModal'
 
 export function AppShell() {
   return (
@@ -10,6 +11,7 @@ export function AppShell() {
         <Outlet />
       </main>
       <Toaster />
+      <ShortcutsModal />
     </div>
   )
 }
