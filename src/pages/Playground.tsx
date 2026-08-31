@@ -36,7 +36,7 @@ export function Playground() {
   return (
     <div className="flex flex-1 flex-col md:h-[calc(100vh-4rem)]">
       <div className="flex flex-1 flex-col md:flex-row md:overflow-hidden">
-        <aside className="hidden w-64 shrink-0 border-r border-border bg-surface md:block">
+        <aside className="hidden w-64 shrink-0 border-r border-border bg-surface md:block md:min-h-0">
           <GeneratorLibrary />
         </aside>
 
@@ -44,7 +44,7 @@ export function Playground() {
           <DesignCanvas design={design} background={palette.background} />
         </div>
 
-        <aside className="hidden w-72 shrink-0 border-l border-border bg-surface md:block">
+        <aside className="hidden w-72 shrink-0 border-l border-border bg-surface md:block md:min-h-0">
           <ControlPanel />
         </aside>
       </div>

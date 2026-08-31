@@ -28,16 +28,10 @@ export function GeneratorLibrary() {
   const generatorId = useDesignStore((s) => s.generatorId)
   const setGenerator = useDesignStore((s) => s.setGenerator)
   const [query, setQuery] = useState('')
-  const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null)
   const generators = generatorRegistry.all()
 
-  const toggleCategory = (cat: string) =>
-    setCollapsed((prev) => {
-      const next = new Set(prev)
-      if (next.has(cat)) next.delete(cat)
-      else next.add(cat)
-      return next
-    })
+  const toggleCategory = (cat: string) => setExpandedCategory((prev) => (prev === cat ? null : cat))
 
   const q = query.trim().toLowerCase()
   const filtered = q
@@ -67,7 +61,7 @@ export function GeneratorLibrary() {
       </h2>
       {categories.length === 0 && q && <p className="px-1.5 text-xs text-text-muted">No generators match “{query}”.</p>}
       {categories.map((cat) => {
-        const isOpen = q ? true : !collapsed.has(cat)
+        const isOpen = q ? true : expandedCategory === cat
         return (
           <div key={cat} className="mb-1">
             <button
