@@ -1,12 +1,17 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type MouseEvent, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { generatorRegistry } from '@/engine/registry'
 import { renderDesignToSvgString } from '@/engine/render'
+import { composeLayers, defaultLayerState } from '@/engine/composeLayers'
 import { createRng } from '@/engine/prng'
+import { generateVariations } from '@/engine/evolve'
 import { PALETTE_PRESETS } from '@/palette/presets'
 import { useDesignStore } from '@/state/useDesignStore'
+import { copySvgToClipboard } from '@/export/clipboard'
+import { useToastStore } from '@/state/useToastStore'
 import { AdSlot } from '@/components/ads/AdSlot'
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
+import { ShuffleIcon, PaletteIcon, CopyIcon } from '@/components/ui/icons'
 
 interface GalleryItem {
   generatorId: string
@@ -36,12 +41,12 @@ export function Explore() {
   const categories = ['all', ...Array.from(new Set(generatorRegistry.all().map((g) => g.category)))]
   const filtered = items.filter((item) => category === 'all' || generatorRegistry.get(item.generatorId)!.category === category)
 
-  const openInPlayground = (item: GalleryItem) => {
+  const openInPlayground = (item: GalleryItem, paletteIndex: number) => {
     const generator = generatorRegistry.get(item.generatorId)!
     setGenerator(generator.id)
     setParameters({ ...generator.defaultParameters })
     setSeed(item.seed)
-    setPalette(PALETTE_PRESETS[item.paletteIndex])
+    setPalette(PALETTE_PRESETS[paletteIndex])
     navigate('/playground')
   }
 
@@ -50,7 +55,9 @@ export function Explore() {
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-text">Explore</h1>
-          <p className="mt-1 text-sm text-text-muted">Click anything to open it in the playground and remix it.</p>
+          <p className="mt-1 text-sm text-text-muted">
+            Click anything to open it in the playground — or evolve, recolor, and copy it right here.
+          </p>
         </div>
         <SegmentedControl
           options={categories.map((c) => ({ label: c === 'all' ? 'All' : c[0].toUpperCase() + c.slice(1), value: c }))}
@@ -61,7 +68,7 @@ export function Explore() {
 
       <div className="columns-2 gap-3 sm:columns-3 lg:columns-4 [&>*]:mb-3">
         {filtered.slice(0, 12).map((item, i) => (
-          <GalleryTile key={i} item={item} onClick={() => openInPlayground(item)} />
+          <GalleryTile key={i} item={item} onOpen={openInPlayground} />
         ))}
       </div>
 
@@ -71,29 +78,67 @@ export function Explore() {
 
       <div className="columns-2 gap-3 sm:columns-3 lg:columns-4 [&>*]:mb-3">
         {filtered.slice(12).map((item, i) => (
-          <GalleryTile key={i} item={item} onClick={() => openInPlayground(item)} />
+          <GalleryTile key={i} item={item} onOpen={openInPlayground} />
         ))}
       </div>
     </div>
   )
 }
 
-function GalleryTile({ item, onClick }: { item: GalleryItem; onClick: () => void }) {
+function GalleryTile({ item, onOpen }: { item: GalleryItem; onOpen: (item: GalleryItem, paletteIndex: number) => void }) {
   const generator = generatorRegistry.get(item.generatorId)!
-  const palette = PALETTE_PRESETS[item.paletteIndex]
-  const markup = useMemo(() => {
-    const design = generator.generate(generator.defaultParameters, item.seed, palette.colors)
-    return renderDesignToSvgString(design, { includeMetadata: false, sizeMode: 'fill' })
-  }, [generator, item.seed, palette])
+  const show = useToastStore((s) => s.show)
+  const [seed, setSeed] = useState(item.seed)
+  const [paletteIndex, setPaletteIndex] = useState(item.paletteIndex)
+  const palette = PALETTE_PRESETS[paletteIndex]
+
+  const design = useMemo(() => generator.generate(generator.defaultParameters, seed, palette.colors), [generator, seed, palette])
+  const markup = useMemo(() => renderDesignToSvgString(design, { includeMetadata: false, sizeMode: 'fill' }), [design])
+
+  const evolve = (e: MouseEvent) => {
+    e.stopPropagation()
+    const [variation] = generateVariations(generator, generator.defaultParameters, 1, 0.2)
+    setSeed(variation.seed)
+  }
+
+  const recolor = (e: MouseEvent) => {
+    e.stopPropagation()
+    setPaletteIndex((i) => (i + 1 + Math.floor(Math.random() * (PALETTE_PRESETS.length - 1))) % PALETTE_PRESETS.length)
+  }
+
+  const copyToFigma = async (e: MouseEvent) => {
+    e.stopPropagation()
+    const composed = composeLayers(design, palette, defaultLayerState())
+    await copySvgToClipboard(renderDesignToSvgString(composed))
+    show('Copied! Paste it into Figma.')
+  }
 
   return (
+    <div className="group relative overflow-hidden rounded-xl border border-border transition-transform duration-200 hover:scale-[1.02]">
+      <button onClick={() => onOpen(item, paletteIndex)} className="block w-full" style={{ background: palette.background }}>
+        {/* eslint-disable-next-line react/no-danger */}
+        <div dangerouslySetInnerHTML={{ __html: markup }} />
+      </button>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-end gap-1 bg-gradient-to-t from-black/50 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
+        <div className="pointer-events-auto flex items-center gap-1">
+          <TileAction label="Evolve" onClick={evolve} icon={<ShuffleIcon width={14} height={14} />} />
+          <TileAction label="Recolor" onClick={recolor} icon={<PaletteIcon width={14} height={14} />} />
+          <TileAction label="Copy to Figma" onClick={copyToFigma} icon={<CopyIcon width={14} height={14} />} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function TileAction({ label, icon, onClick }: { label: string; icon: ReactNode; onClick: (e: MouseEvent) => void }) {
+  return (
     <button
+      aria-label={label}
+      title={label}
       onClick={onClick}
-      className="block w-full overflow-hidden rounded-xl border border-border transition-transform duration-200 hover:scale-[1.02]"
-      style={{ background: palette.background }}
+      className="flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-black shadow-sm transition-transform hover:scale-110"
     >
-      {/* eslint-disable-next-line react/no-danger */}
-      <div dangerouslySetInnerHTML={{ __html: markup }} />
+      {icon}
     </button>
   )
 }

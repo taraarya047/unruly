@@ -42,7 +42,8 @@ consume this data to render `<svg>` — they never generate design data with sid
 
 Every design is fully reproducible from `{ generatorId, parameters, seed, paletteId }`. All randomness inside
 a generator must be pulled from the seeded PRNG passed into `generate()`. This is what makes Randomize / Evolve /
-Lock subsystems / Undo-Redo / Saved designs / future shareable URLs all work without a backend.
+Lock subsystems / Undo-Redo / Saved designs / shareable URLs (`state/shareLink.ts` base64url-encodes this
+exact tuple into `?d=`) all work without a backend.
 
 ## State
 

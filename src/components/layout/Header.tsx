@@ -7,9 +7,10 @@ import { generatorRegistry } from '@/engine/registry'
 import { renderDesignToSvgString } from '@/engine/render'
 import { IconButton } from '@/components/ui/IconButton'
 import { ExportMenu } from '@/components/export/ExportMenu'
-import { UndoIcon, RedoIcon, SaveIcon, SunIcon, MoonIcon, HelpIcon } from '@/components/ui/icons'
+import { UndoIcon, RedoIcon, SaveIcon, SunIcon, MoonIcon, HelpIcon, LinkIcon } from '@/components/ui/icons'
 import { useUIStore } from '@/state/useUIStore'
 import { useToastStore } from '@/state/useToastStore'
+import { buildShareUrl } from '@/state/shareLink'
 import clsx from 'clsx'
 
 export function Header() {
@@ -38,6 +39,12 @@ export function Header() {
   const handleSave = () => {
     save({ name: generator?.name ?? 'Design', generatorId, parameters, seed, palette, layers })
     show('Saved to your library')
+  }
+
+  const handleCopyLink = async () => {
+    const url = buildShareUrl(generatorId, parameters, seed, palette)
+    await navigator.clipboard.writeText(url)
+    show('Link copied — anyone who opens it sees this exact design')
   }
 
   return (
@@ -74,6 +81,9 @@ export function Header() {
             </IconButton>
             <IconButton label="Save (⌘S)" onClick={handleSave}>
               <SaveIcon />
+            </IconButton>
+            <IconButton label="Copy shareable link" onClick={handleCopyLink}>
+              <LinkIcon />
             </IconButton>
             <div className="mx-1 h-6 w-px bg-border" />
           </>

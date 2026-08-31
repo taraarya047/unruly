@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useCurrentDesign } from '@/hooks/useCurrentDesign'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 import { useDesignStore } from '@/state/useDesignStore'
 import { renderDesignToSvgString } from '@/engine/render'
+import { decodeShareUrl } from '@/state/shareLink'
+import { defaultLayerState } from '@/engine/composeLayers'
 import { DesignCanvas } from '@/components/canvas/DesignCanvas'
 import { GeneratorLibrary } from '@/components/generator/GeneratorLibrary'
 import { ControlPanel } from '@/components/controls/ControlPanel'
@@ -17,6 +19,19 @@ export function Playground() {
   const design = useCurrentDesign()
   const palette = useDesignStore((s) => s.palette)
   const [mobileSheet, setMobileSheet] = useState<'generators' | 'controls' | null>(null)
+
+  useEffect(() => {
+    const shared = decodeShareUrl(window.location.search)
+    if (!shared) return
+    useDesignStore.getState().loadSnapshot({
+      generatorId: shared.generatorId,
+      parameters: shared.parameters,
+      seed: shared.seed,
+      palette: shared.palette,
+      layers: defaultLayerState(),
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className="flex flex-1 flex-col md:h-[calc(100vh-4rem)]">

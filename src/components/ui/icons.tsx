@@ -76,6 +76,9 @@ export const GridIcon = (p: IconProps) => (
 export const EyeIcon = (p: IconProps) => (
   <svg {...base} {...p}><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" /><circle cx="12" cy="12" r="2.5" /></svg>
 )
+export const LinkIcon = (p: IconProps) => (
+  <svg {...base} {...p}><path d="M9.5 14.5 14.5 9.5" /><path d="M11 7.5l1.4-1.4a3.5 3.5 0 0 1 5 5L16 12.5M13 16.5l-1.4 1.4a3.5 3.5 0 0 1-5-5L8 11.5" /></svg>
+)
 export const EyeOffIcon = (p: IconProps) => (
   <svg {...base} {...p}><path d="M3.5 3.5l17 17" /><path d="M10.6 5.7c.45-.1.9-.15 1.4-.15 6 0 9.5 6.5 9.5 6.5a15 15 0 0 1-3.3 3.9M6.7 6.7A15.7 15.7 0 0 0 2.5 12S6 18.5 12 18.5c1.2 0 2.3-.25 3.3-.65" /><path d="M9.5 12a2.5 2.5 0 0 0 3.6 2.24" /></svg>
 )
