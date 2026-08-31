@@ -40,5 +40,7 @@ export function renderDesignToSvgString(design: GeneratedDesign, options: Render
     ? ` data-generator="${design.metadata.generatorId}" data-seed="${design.seed}" data-palette="${design.metadata.paletteId}"`
     : ''
   const dims = sizeMode === 'fill' ? `width="100%" height="100%"` : `width="${design.width}" height="${design.height}"`
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${design.width} ${design.height}" ${dims}${meta}>${renderDesignInner(design)}</svg>`
+  // Round caps/joins as a document-level default — every stroked path (lines, flow fields, ribbons,
+  // attractors...) reads better rounded, and shapes that don't stroke are unaffected.
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${design.width} ${design.height}" ${dims} stroke-linecap="round" stroke-linejoin="round"${meta}>${renderDesignInner(design)}</svg>`
 }

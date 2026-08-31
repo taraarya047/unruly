@@ -53,4 +53,22 @@
       backed by `useCustomPaletteStore`, with custom palettes folded into the randomization pool alongside
       built-ins. Four new generators — Spiral, Hex Grid, Halftone, Mandala — bringing the total to 14.
 
+- [x] **40-generator expansion** (user-requested, outside the original phase plan): 38 new generators across
+      Geometry/Organic/Lines/Fields/Particles/Topology/Tessellation/Optical/Mathematical/Experimental/Texture/
+      Playful/Architectural/Illustrative, bringing the total to 52 (two spec-requested concepts, Halftone and
+      Confetti Party, already matched existing generators closely enough that adding near-duplicates would
+      have violated the spec's own "if indistinguishable, combine" guidance). Extracted a shared `engine/math/`
+      layer (Delaunay/Voronoi, marching-squares contour extraction, L-systems + turtle graphics, chaotic
+      attractors, isometric projection, noise/height fields) so new generators reuse non-trivial algorithms
+      instead of reimplementing them, and added a search box to the generator library. Confirmed the existing
+      lock/Evolve/mutation/undo-redo architecture required zero per-generator code to support all 38 new
+      generators — those systems only ever read a generator's declarative `parameterSchema`. Built an automated
+      smoke test (`window.__smokeTest`) covering all 52 generators × default/min/max params × 3 seeds (468
+      cases) checking for NaN/Infinity, invalid SVG (`DOMParser` parse errors), and slow renders (>250ms); it
+      caught two real, previously-undetected bugs: a dormant duplicate-XML-attribute bug in the `ring`
+      primitive (fixed in `engine/shapes.ts`/`engine/types.ts`) that broke every generator using it, and a
+      performance regression where Topographic Map (and the pre-existing Checker generator) resampled an
+      expensive field/produced excessive shape counts (fixed via `sampleGrid`/`marchingSquaresFromGrid` reuse
+      and a raised `tileSize` minimum, respectively).
+
 See per-phase "what shipped" notes in commit history and end-of-phase reports.

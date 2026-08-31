@@ -20,9 +20,14 @@ interface GeneratorDefinition {
 }
 ```
 
-`ParameterSchema` entries declare `{ key, label, group ('shape'|'pattern'|'variation'|'composition'), type
-('number'|'angle'|'select'|'boolean'), min, max, step, advanced }`. The control panel renders these generically —
-no per-generator editor code. `advanced: true` params only show in Advanced Mode (§16 of the spec).
+`ParameterSchema` entries declare `{ key, label, group ('shape'|'pattern'|'variation'|'composition'|'color'), type
+('number'|'angle'|'select'|'boolean'), min, max, step, advanced, semantic }`. The control panel renders these
+generically — no per-generator editor code. `advanced: true` params only show in Advanced Mode (§16 of the
+spec). `tags?: string[]` is optional free-form metadata for the generator-library search box.
+
+This is also why locks, Evolve, "Make it..." mutation, and undo/redo all worked immediately for all 38
+generators added in the 40-generator expansion with zero per-generator code: those systems only ever read
+`parameterSchema`, never a generator's `id`.
 
 ## Determinism
 
@@ -35,14 +40,43 @@ same `GeneratedDesign`.
 Generators compose from a small primitive set (`engine/shapes.ts`): `circle, rect, polygon, star, line, path,
 blob, arc, ring`. Each primitive serializes to real SVG so output stays editable vector, never rasterized.
 
-## Generators (14)
+## Shared math (`engine/math/`)
 
-Geometric: Dot Field, Grid, Circles, Polygon Field, Checker/Tile, Hex Grid.
-Lines: Waves, Concentric Lines, Flow Lines, Spiral.
-Organic: Blobs, Mandala.
-Experimental: Confetti, Halftone.
+Extracted once several generators needed the same non-trivial algorithm, rather than reimplemented per file:
 
-14 generators spanning all four categories, validating the architecture before scaling toward 30-50.
+- `points.ts` — seeded random/jittered-grid point distributions
+- `noise.ts` — cheap seeded value-noise field + a multi-well height field for terrain-like generators
+- `delaunay.ts` — Bowyer-Watson Delaunay triangulation
+- `voronoi.ts` — Voronoi cells via half-plane intersection (independent of the Delaunay dual, for robustness)
+- `marchingSquares.ts` — scalar-field contour extraction; `sampleGrid`/`marchingSquaresFromGrid` split the
+  (expensive) field sampling from the (cheap) per-threshold contour pass so a many-contour generator samples
+  the field once, not once per contour — see Topographic Map
+- `lsystem.ts` — L-system string rewriting + turtle-graphics interpreter, with presets (tree/fern/coral/...)
+- `attractors.ts` — Lorenz/Clifford/De Jong chaotic systems
+- `isometric.ts` — isometric axis vectors + a shaded 3-face box primitive (Isometric City, Impossible Stairs)
+
+## Generators (52)
+
+**Geometric**: Dot Field, Grid, Circles, Polygon Field, Checker/Tile, Hex Grid.
+**Lines**: Waves, Concentric Lines, Flow Lines, Spiral.
+**Organic**: Blobs, Mandala, Metaballs, L-System Forest, Liquid Swirl, Paper Cut, Chaos Garden, Fractal Bloom.
+**Experimental**: Confetti, Halftone.
+**Fields**: Force Field, Magnetic Lines, Gravity Well.
+**Particles**: Particle Constellation, Spiral Galaxy.
+**Topology**: Voronoi Worlds.
+**Tessellation**: Tile Morpher.
+**Mathematical**: Delaunay Mesh, String Art, Lorenz Trails, Strange Attractor, Spiral Shell, Orbital System,
+Radial Mandala, Geometric Flower, Radiating Sun.
+**Optical**: Kaleidoscope, Impossible Stairs, Moiré, Op Art.
+**Texture**: Topographic Map, Height Field, Weaving, Pixel Mosaic, Glitch Grid.
+**Playful**: Chaos Garden, Doodle Field.
+**Architectural**: Isometric City, Abstract Floorplan.
+**Illustrative**: Stained Glass, Paper Cut, Ribbon Sculpture, Ink Splash, Magnetic Typography Field.
+
+(Some generators carry more than one category tag; the list above groups by primary category, matching the
+generator library sidebar.) Two spec-requested concepts — Halftone and Confetti Party — already matched
+existing generators (Halftone, Confetti) closely enough that adding near-duplicates would have violated the
+spec's own "if indistinguishable, combine" guidance; they're the same generators, not new ones.
 
 ## Mutation & evolution
 

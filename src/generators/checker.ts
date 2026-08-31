@@ -16,7 +16,8 @@ export const checkerGenerator: GeneratorDefinition = {
     scale: 1,
   },
   parameterSchema: [
-    { key: 'tileSize', label: 'Tile size', type: 'number', group: 'pattern', min: 4, max: 40, step: 1, semantic: 'density' },
+    // Below ~8px tiles the shape count crosses the ~5000-node SVG performance/export threshold.
+    { key: 'tileSize', label: 'Tile size', type: 'number', group: 'pattern', min: 8, max: 40, step: 1, semantic: 'density' },
     { key: 'scale', label: 'Scale', type: 'number', group: 'shape', min: 0.5, max: 1.3, step: 0.02, semantic: 'scale' },
     { key: 'rotation', label: 'Rotation', type: 'angle', group: 'composition', min: 0, max: 45, step: 1, semantic: 'rotation' },
     { key: 'distortion', label: 'Distortion', type: 'number', group: 'variation', min: 0, max: 1, step: 0.02, semantic: 'jitter' },

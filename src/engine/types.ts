@@ -3,6 +3,16 @@ export type GeneratorCategory =
   | 'organic'
   | 'lines'
   | 'experimental'
+  | 'fields'
+  | 'particles'
+  | 'topology'
+  | 'tessellation'
+  | 'optical'
+  | 'mathematical'
+  | 'texture'
+  | 'playful'
+  | 'architectural'
+  | 'illustrative'
 
 export type ParamGroup = 'shape' | 'pattern' | 'variation' | 'composition' | 'color'
 
@@ -44,7 +54,7 @@ export type ParameterSchema = NumberParamSchema | SelectParamSchema | BooleanPar
 
 export type ShapePrimitive =
   | { kind: 'circle'; cx: number; cy: number; r: number }
-  | { kind: 'ring'; cx: number; cy: number; r: number; strokeWidth: number }
+  | { kind: 'ring'; cx: number; cy: number; r: number }
   | { kind: 'rect'; x: number; y: number; w: number; h: number; rx?: number; rotation?: number }
   | { kind: 'polygon'; cx: number; cy: number; r: number; sides: number; rotation?: number }
   | { kind: 'star'; cx: number; cy: number; rOuter: number; rInner: number; points: number; rotation?: number }
@@ -99,6 +109,8 @@ export interface GeneratorDefinition {
   name: string
   category: GeneratorCategory
   description: string
+  /** Free-form keywords for search/discovery — a generator can span multiple. */
+  tags?: string[]
   defaultParameters: GeneratorParameters
   parameterSchema: ParameterSchema[]
   generate: (parameters: GeneratorParameters, seed: number, colors: string[]) => GeneratedDesign

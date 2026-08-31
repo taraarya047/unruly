@@ -62,7 +62,10 @@ function renderPrimitive(shape: ShapePrimitive): string {
     case 'circle':
       return `<circle cx="${round(shape.cx)}" cy="${round(shape.cy)}" r="${round(shape.r)}" />`
     case 'ring':
-      return `<circle cx="${round(shape.cx)}" cy="${round(shape.cy)}" r="${round(shape.r)}" fill="none" stroke-width="${round(shape.strokeWidth)}" />`
+      // Geometrically identical to 'circle' — the semantic distinction is the caller's intent to
+      // stroke it as an outline, which it expresses via StyledShape.fill/stroke, not baked-in here
+      // (baking fill/stroke-width into the primitive markup would collide with those attrs).
+      return `<circle cx="${round(shape.cx)}" cy="${round(shape.cy)}" r="${round(shape.r)}" />`
     case 'rect': {
       const rot = shape.rotation
         ? ` transform="rotate(${round(shape.rotation)} ${round(shape.x + shape.w / 2)} ${round(shape.y + shape.h / 2)})"`

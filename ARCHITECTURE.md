@@ -19,8 +19,11 @@ engine/        Framework-independent generative core. No React imports.
   evolve.ts        Design evolution / variation tree helpers
   composeLayers.ts Merges a generator's raw layers with the synthetic Background layer, user
                    visibility/lock/opacity overrides, custom stacking order, and duplicated layers
+  math/          Shared generative-math utilities used across multiple generators (Delaunay/Voronoi,
+                 marching squares, L-systems, chaotic attractors, isometric projection, noise) — see
+                 GENERATOR_SYSTEM.md for the full list
 
-generators/     Individual GeneratorDefinition implementations (dotField, grid, circles, waves, blobs, ...)
+generators/     52 individual GeneratorDefinition implementations (dotField, grid, voronoiWorlds, ...)
 
 palette/        Palette engine: built-in presets (Pride and Trans Pride always pinned first — see
                 PINNED_PALETTE_IDS), harmony generation, palette <-> design binding
