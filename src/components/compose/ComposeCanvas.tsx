@@ -31,7 +31,12 @@ export function ComposeCanvas() {
       >
         <div className="absolute inset-0 flex items-center justify-center">
           <div style={{ transform: `translate(${view.pan.x}px, ${view.pan.y}px) scale(${view.zoom})` }} className="relative shrink-0 shadow-[0_1px_2px_rgba(0,0,0,0.06),0_16px_48px_-12px_rgba(0,0,0,0.25)]">
-            <div style={{ width: frameW, height: frameH }} dangerouslySetInnerHTML={{ __html: markup }} />
+            <div
+              style={{ width: frameW, height: frameH }}
+              role="img"
+              aria-label="Composed poster preview"
+              dangerouslySetInnerHTML={{ __html: markup }}
+            />
             {zone && (
               <div
                 className="pointer-events-none absolute rounded-sm border-2 border-dashed border-accent/70"

@@ -30,6 +30,7 @@ export function Compose() {
           <div className="mb-4 aspect-square w-full overflow-hidden rounded-xl border border-border" style={{ background: palette.background }}>
             <div
               className="h-full w-full"
+              aria-hidden="true"
               // eslint-disable-next-line react/no-danger
               dangerouslySetInnerHTML={{
                 __html: renderCompositionToSvgString(design, palette, { ...comp, layoutId: 'centered', focalX: 0.5, focalY: 0.5, scale: 1, rotation: 0, safeZone: 'none', text: { ...comp.text, enabled: false } }),

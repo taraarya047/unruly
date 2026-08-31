@@ -3,7 +3,7 @@ import { useToastStore } from '@/state/useToastStore'
 export function Toaster() {
   const toasts = useToastStore((s) => s.toasts)
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-6 z-[100] flex flex-col items-center gap-2 px-4">
+    <div className="pointer-events-none fixed inset-x-0 bottom-6 z-[100] flex flex-col items-center gap-2 px-4" role="status" aria-live="polite">
       {toasts.map((t) => (
         <div
           key={t.id}

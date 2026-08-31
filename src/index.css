@@ -10,7 +10,7 @@
   --text: #171512;
   --text-muted: #6b6559;
   --accent: #ff5a36;
-  --accent-foreground: #fffaf5;
+  --accent-foreground: #1a0e08;
   --control-bg: #ece9df;
   --control-hover: #e2ded1;
   --shadow-color: 20 14% 8%;
@@ -64,6 +64,13 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+  }
+
+  /* Consistent, visible keyboard focus ring everywhere — spec §50. Mouse/touch clicks don't show it. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 2px;
   }
 }
 

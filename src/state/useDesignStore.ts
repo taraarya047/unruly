@@ -52,6 +52,7 @@ interface DesignStoreState extends DesignSnapshot {
 
   setGenerator: (generatorId: string) => void
   setParameter: (key: string, value: number | string | boolean) => void
+  setParameterLive: (key: string, value: number | string | boolean) => void
   setParameters: (params: GeneratorParameters) => void
   setSeed: (seed: number) => void
   setPalette: (palette: Palette) => void
@@ -69,6 +70,7 @@ interface DesignStoreState extends DesignSnapshot {
   toggleLayerVisible: (id: string) => void
   toggleLayerLocked: (id: string) => void
   setLayerOpacity: (id: string, opacity: number) => void
+  setLayerOpacityLive: (id: string, opacity: number) => void
   duplicateLayer: (layer: SVGLayer) => void
   deleteExtraLayer: (id: string) => void
   setLayerOrder: (order: string[]) => void
@@ -130,6 +132,12 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
         const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters, seed: state.seed, palette: state.palette, layers: state.layers }
         return { parameters, ...pushHistory(state, snapshot) }
       })
+    },
+
+    // Updates the live value during a drag without pushing history — a slider drag should be one
+    // undo step, not one per tick. The UI calls setParameter once more at drag end to commit it.
+    setParameterLive: (key, value) => {
+      set((state) => ({ parameters: { ...state.parameters, [key]: value } }))
     },
 
     setParameters: (params) => {
@@ -280,6 +288,14 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
         const layers: LayerState = { ...state.layers, overrides: { ...state.layers.overrides, [id]: { ...current, opacity } } }
         const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed: state.seed, palette: state.palette, layers }
         return { layers, ...pushHistory(state, snapshot) }
+      })
+    },
+
+    // Live drag preview for the layer opacity slider — no history entry (see setParameterLive).
+    setLayerOpacityLive: (id, opacity) => {
+      set((state) => {
+        const current = state.layers.overrides[id] ?? {}
+        return { layers: { ...state.layers, overrides: { ...state.layers.overrides, [id]: { ...current, opacity } } } }
       })
     },
 

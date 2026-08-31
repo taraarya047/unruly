@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import type { SVGLayer } from '@/engine/types'
 import { useCurrentDesign } from '@/hooks/useCurrentDesign'
 import { useDesignStore } from '@/state/useDesignStore'
+import { useRafThrottle } from '@/hooks/useRafThrottle'
 import { IconButton } from '@/components/ui/IconButton'
 import { EyeIcon, EyeOffIcon, LockIcon, UnlockIcon, CopyIcon, TrashIcon, ChevronDownIcon } from '@/components/ui/icons'
 
@@ -13,6 +15,7 @@ export function LayerPanel() {
   const toggleLayerVisible = useDesignStore((s) => s.toggleLayerVisible)
   const toggleLayerLocked = useDesignStore((s) => s.toggleLayerLocked)
   const setLayerOpacity = useDesignStore((s) => s.setLayerOpacity)
+  const setLayerOpacityLive = useDesignStore((s) => s.setLayerOpacityLive)
   const duplicateLayer = useDesignStore((s) => s.duplicateLayer)
   const deleteExtraLayer = useDesignStore((s) => s.deleteExtraLayer)
   const setLayerOrder = useDesignStore((s) => s.setLayerOrder)
@@ -40,7 +43,8 @@ export function LayerPanel() {
           deletable={extraLayers.some((l) => l.id === layer.id)}
           onToggleVisible={() => toggleLayerVisible(layer.id)}
           onToggleLocked={() => toggleLayerLocked(layer.id)}
-          onOpacityChange={(v) => setLayerOpacity(layer.id, v)}
+          onOpacityChange={(v) => setLayerOpacityLive(layer.id, v)}
+          onOpacityCommit={(v) => setLayerOpacity(layer.id, v)}
           onDuplicate={() => duplicateLayer(layer)}
           onDelete={() => deleteExtraLayer(layer.id)}
           onMoveUp={() => move(layer.id, 'up')}
@@ -59,13 +63,31 @@ interface LayerRowProps {
   onToggleVisible: () => void
   onToggleLocked: () => void
   onOpacityChange: (v: number) => void
+  onOpacityCommit: (v: number) => void
   onDuplicate: () => void
   onDelete: () => void
   onMoveUp: () => void
   onMoveDown: () => void
 }
 
-function LayerRow({ layer, isTop, isBottom, deletable, onToggleVisible, onToggleLocked, onOpacityChange, onDuplicate, onDelete, onMoveUp, onMoveDown }: LayerRowProps) {
+function LayerRow({ layer, isTop, isBottom, deletable, onToggleVisible, onToggleLocked, onOpacityChange, onOpacityCommit, onDuplicate, onDelete, onMoveUp, onMoveDown }: LayerRowProps) {
+  const [display, setDisplay] = useState(layer.opacity)
+  const [trackedOpacity, setTrackedOpacity] = useState(layer.opacity)
+  if (layer.opacity !== trackedOpacity) {
+    setTrackedOpacity(layer.opacity)
+    setDisplay(layer.opacity)
+  }
+  const raf = useRafThrottle()
+
+  const handleInput = (v: number) => {
+    setDisplay(v)
+    raf.schedule(() => onOpacityChange(v))
+  }
+  const commit = () => {
+    raf.cancel()
+    onOpacityCommit(display)
+  }
+
   return (
     <div className="rounded-lg border border-border bg-control-bg/50 px-2 py-1.5">
       <div className="flex items-center gap-1">
@@ -104,13 +126,17 @@ function LayerRow({ layer, isTop, isBottom, deletable, onToggleVisible, onToggle
           min={0}
           max={1}
           step={0.02}
-          value={layer.opacity}
+          value={display}
           disabled={layer.locked}
-          onChange={(e) => onOpacityChange(Number(e.target.value))}
+          onChange={(e) => handleInput(Number(e.target.value))}
+          onMouseUp={commit}
+          onTouchEnd={commit}
+          onKeyUp={commit}
+          onBlur={commit}
           className="slider-range h-1 flex-1 cursor-pointer appearance-none rounded-full bg-control-bg disabled:cursor-not-allowed disabled:opacity-40"
-          style={{ backgroundImage: `linear-gradient(to right, var(--accent) ${layer.opacity * 100}%, transparent ${layer.opacity * 100}%)` }}
+          style={{ backgroundImage: `linear-gradient(to right, var(--accent) ${display * 100}%, transparent ${display * 100}%)` }}
         />
-        <span className="w-8 shrink-0 text-right text-xs tabular-nums text-text-muted">{Math.round(layer.opacity * 100)}%</span>
+        <span className="w-8 shrink-0 text-right text-xs tabular-nums text-text-muted">{Math.round(display * 100)}%</span>
       </div>
     </div>
   )

@@ -24,6 +24,7 @@ export function ControlPanel() {
   const generatorId = useDesignStore((s) => s.generatorId)
   const parameters = useDesignStore((s) => s.parameters)
   const setParameter = useDesignStore((s) => s.setParameter)
+  const setParameterLive = useDesignStore((s) => s.setParameterLive)
   const advancedMode = useDesignStore((s) => s.advancedMode)
   const toggleAdvancedMode = useDesignStore((s) => s.toggleAdvancedMode)
   const applyAction = useDesignStore((s) => s.applyAction)
@@ -62,7 +63,13 @@ export function ControlPanel() {
             <div className="mb-3 text-xs font-medium text-text-muted">{GROUP_LABELS[group]}</div>
             <div className="space-y-4">
               {schemas.map((schema) => (
-                <ParamControl key={schema.key} schema={schema} value={parameters[schema.key]} onChange={(v) => setParameter(schema.key, v)} />
+                <ParamControl
+                  key={schema.key}
+                  schema={schema}
+                  value={parameters[schema.key]}
+                  onChange={(v) => setParameterLive(schema.key, v)}
+                  onCommit={(v) => setParameter(schema.key, v)}
+                />
               ))}
             </div>
           </div>

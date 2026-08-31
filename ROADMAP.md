@@ -27,7 +27,21 @@
       (`state/shareLink.ts` — base64url-encodes `{generator, parameters, seed, palette}` into `?d=`, decoded
       and hydrated on Playground load; round-trip and malformed-input handling verified). Still missing:
       tags, and JSON import/export of a single saved design.
-- [ ] **Phase 7 — Advertising**: real ad network integration behind the existing `AdSlot` contract.
-- [ ] **Phase 8 — Polish**: visual/interaction/perf/accessibility/export review pass.
+- [ ] **Phase 7 — Advertising**: real ad network integration behind the existing `AdSlot` contract. Needs
+      actual ad-network accounts/SDKs this environment doesn't have — skipped, not attempted.
+- [x] **Phase 8 — Polish**: found and fixed real issues rather than a cosmetic pass —
+      (1) **Accessibility**: added a global `:focus-visible` ring (nothing had one before), fixed the Home
+      hero mutator (a clickable `div` with no keyboard support — now a real `<button>`), added Escape-to-close
+      + `role="dialog"`/`aria-labelledby` to Modal and BottomSheet (neither closed on Escape before), added
+      `role="status"`/`aria-live` to the toaster, `role="img"`/`aria-label` on rendered-SVG previews that
+      lacked one, and fixed a real WCAG failure: light-mode primary buttons (white text on the orange accent)
+      measured 2.99:1 contrast, below the 4.5:1 AA minimum — fixed by darkening `--accent-foreground` in
+      light mode to 6.10:1, verified by computing contrast ratios for every text/surface pairing in both
+      themes. (2) **Performance/correctness**: profiled every generator at max parameters (worst case ~27ms
+      for Flow Lines) and found every slider drag was pushing one undo-history entry *per tick* — confirmed
+      via the store that a 20-tick drag created 20 undo steps. Fixed with a live/commit split
+      (`setParameterLive` for drag-time updates, no history; `setParameter` commits once on release) plus
+      `requestAnimationFrame` coalescing, verified a 21-tick simulated drag now produces exactly one history
+      entry and one Undo reverts the whole drag.
 
 See per-phase "what shipped" notes in commit history and end-of-phase reports.
