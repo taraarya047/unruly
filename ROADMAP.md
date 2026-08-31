@@ -22,11 +22,14 @@
       no navigation required — the "evolve/remix from inspiration" loop from the spec. Still a lightweight
       deterministic gallery (24 fixed items from one seeded RNG), not a browsable/paginated/curated one; no
       preset gallery section separate from the generator gallery.
-- [~] **Phase 6 — Saved Designs** (partial): search by name, inline rename, duplicate now wired up (the
-      store actions existed since Phase 1 but had no UI). Shareable design URLs shipped
-      (`state/shareLink.ts` — base64url-encodes `{generator, parameters, seed, palette}` into `?d=`, decoded
-      and hydrated on Playground load; round-trip and malformed-input handling verified). Still missing:
-      tags, and JSON import/export of a single saved design.
+- [x] **Phase 6 — Saved Designs**: search by name, inline rename, duplicate (store actions existed since
+      Phase 1, wired to UI in this phase). Shareable design URLs (`state/shareLink.ts` — base64url-encodes
+      `{generator, parameters, seed, palette}` into `?d=`, decoded and hydrated on Playground load).
+      Tags (add/remove, normalized, filterable via chips at the top of the page) and JSON import/export of a
+      single saved design (`export/designFile.ts` — versioned payload, validates generator id/seed/parameters/
+      palette shape and rejects malformed or unrecognized files without throwing). Verified end-to-end:
+      round-trip preserves tags/parameters/palette with a fresh id, and three invalid-input cases (malformed
+      JSON, wrong shape, unknown generator id) all correctly rejected.
 - [ ] **Phase 7 — Advertising**: real ad network integration behind the existing `AdSlot` contract. Needs
       actual ad-network accounts/SDKs this environment doesn't have — skipped, not attempted.
 - [x] **Phase 8 — Polish**: found and fixed real issues rather than a cosmetic pass —
@@ -43,5 +46,11 @@
       (`setParameterLive` for drag-time updates, no history; `setParameter` commits once on release) plus
       `requestAnimationFrame` coalescing, verified a 21-tick simulated drag now produces exactly one history
       entry and one Undo reverts the whole drag.
+
+- [x] **Palettes & more generators** (user-requested, outside the original phase plan): Pride and Trans
+      Pride palettes, permanently pinned first in every palette list (`PINNED_PALETTE_IDS`) and the default
+      on a fresh session; a Palette Manager (create/edit/delete/reorder custom palettes, built-ins read-only)
+      backed by `useCustomPaletteStore`, with custom palettes folded into the randomization pool alongside
+      built-ins. Four new generators — Spiral, Hex Grid, Halftone, Mandala — bringing the total to 14.
 
 See per-phase "what shipped" notes in commit history and end-of-phase reports.
