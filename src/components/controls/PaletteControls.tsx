@@ -4,13 +4,18 @@ import { useAllPalettes } from '@/palette/allPalettes'
 import { generateHarmonyPalette } from '@/palette/harmony'
 import { createRng, randomSeed } from '@/engine/prng'
 import { Button } from '@/components/ui/Button'
-import { ShuffleIcon } from '@/components/ui/icons'
+import { IconButton } from '@/components/ui/IconButton'
+import { ShuffleIcon, UndoIcon, RedoIcon } from '@/components/ui/icons'
 import { PaletteManagerModal } from './PaletteManagerModal'
 import type { Palette } from '@/palette/types'
 
 export function PaletteControls() {
   const palette = useDesignStore((s) => s.palette)
   const setPalette = useDesignStore((s) => s.setPalette)
+  const undo = useDesignStore((s) => s.undo)
+  const redo = useDesignStore((s) => s.redo)
+  const canUndo = useDesignStore((s) => s.canUndo())
+  const canRedo = useDesignStore((s) => s.canRedo())
   const allPalettes = useAllPalettes()
   const [managerOpen, setManagerOpen] = useState(false)
 
@@ -29,9 +34,17 @@ export function PaletteControls() {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-text">{palette.name}</span>
-        <Button size="sm" variant="ghost" icon={<ShuffleIcon width={14} height={14} />} onClick={shuffle}>
-          Shuffle
-        </Button>
+        <div className="flex items-center gap-1">
+          <IconButton label="Previous palette" onClick={undo} disabled={!canUndo} className="h-7 w-7">
+            <UndoIcon width={14} height={14} />
+          </IconButton>
+          <IconButton label="Next palette" onClick={redo} disabled={!canRedo} className="h-7 w-7">
+            <RedoIcon width={14} height={14} />
+          </IconButton>
+          <Button size="sm" variant="ghost" icon={<ShuffleIcon width={14} height={14} />} onClick={shuffle}>
+            Shuffle
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2">

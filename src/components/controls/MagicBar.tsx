@@ -1,7 +1,7 @@
 import { useDesignStore, type Locks } from '@/state/useDesignStore'
 import { Button } from '@/components/ui/Button'
 import { IconButton } from '@/components/ui/IconButton'
-import { SparkleIcon, LockIcon, UnlockIcon } from '@/components/ui/icons'
+import { SparkleIcon, LockIcon, UnlockIcon, UndoIcon, RedoIcon } from '@/components/ui/icons'
 import { EvolutionPicker } from './EvolutionPicker'
 
 const LOCK_LABELS: { key: keyof Locks; label: string }[] = [
@@ -18,6 +18,10 @@ export function MagicBar() {
   const randomizeRemix = useDesignStore((s) => s.randomizeRemix)
   const randomizeRecolor = useDesignStore((s) => s.randomizeRecolor)
   const randomizeDistort = useDesignStore((s) => s.randomizeDistort)
+  const undo = useDesignStore((s) => s.undo)
+  const redo = useDesignStore((s) => s.redo)
+  const canUndo = useDesignStore((s) => s.canUndo())
+  const canRedo = useDesignStore((s) => s.canRedo())
 
   return (
     <div className="space-y-2.5">
@@ -35,6 +39,15 @@ export function MagicBar() {
         <Button size="sm" onClick={randomizeDistort}>
           Distort
         </Button>
+      </div>
+      <div className="flex items-center justify-center gap-1.5">
+        <IconButton label="Previous design (⌘Z)" onClick={undo} disabled={!canUndo}>
+          <UndoIcon width={16} height={16} />
+        </IconButton>
+        <span className="text-xs text-text-muted">Design history</span>
+        <IconButton label="Next design (⌘⇧Z)" onClick={redo} disabled={!canRedo}>
+          <RedoIcon width={16} height={16} />
+        </IconButton>
       </div>
       <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 pt-1 text-xs text-text-muted">
         {LOCK_LABELS.map(({ key, label }) => (

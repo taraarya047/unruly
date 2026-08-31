@@ -9,10 +9,12 @@ export function PresetStrip() {
   const applyPreset = useDesignStore((s) => s.applyPreset)
 
   return (
-    <div className="grid grid-cols-2 gap-2">
-      {DESIGN_PRESETS.map((preset) => (
-        <PresetTile key={preset.id} preset={preset} onClick={() => applyPreset(preset)} />
-      ))}
+    <div className="max-h-[124px] overflow-y-auto pr-0.5">
+      <div className="grid grid-cols-2 gap-2">
+        {DESIGN_PRESETS.map((preset) => (
+          <PresetTile key={preset.id} preset={preset} onClick={() => applyPreset(preset)} />
+        ))}
+      </div>
     </div>
   )
 }

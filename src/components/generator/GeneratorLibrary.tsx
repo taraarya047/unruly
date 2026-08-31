@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { generatorRegistry } from '@/engine/registry'
 import { useDesignStore } from '@/state/useDesignStore'
+import { ChevronDownIcon } from '@/components/ui/icons'
 import { GeneratorCard } from './GeneratorCard'
 import { PresetStrip } from './PresetStrip'
 
@@ -27,7 +28,16 @@ export function GeneratorLibrary() {
   const generatorId = useDesignStore((s) => s.generatorId)
   const setGenerator = useDesignStore((s) => s.setGenerator)
   const [query, setQuery] = useState('')
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const generators = generatorRegistry.all()
+
+  const toggleCategory = (cat: string) =>
+    setCollapsed((prev) => {
+      const next = new Set(prev)
+      if (next.has(cat)) next.delete(cat)
+      else next.add(cat)
+      return next
+    })
 
   const q = query.trim().toLowerCase()
   const filtered = q
@@ -56,18 +66,29 @@ export function GeneratorLibrary() {
         Generators {q && `(${filtered.length})`}
       </h2>
       {categories.length === 0 && q && <p className="px-1.5 text-xs text-text-muted">No generators match “{query}”.</p>}
-      {categories.map((cat) => (
-        <div key={cat} className="mb-3">
-          <div className="px-1.5 pb-1 text-[11px] font-medium text-text-muted">{CATEGORY_LABELS[cat] ?? cat}</div>
-          <div className="flex flex-col gap-1">
-            {filtered
-              .filter((g) => g.category === cat)
-              .map((g) => (
-                <GeneratorCard key={g.id} generator={g} active={g.id === generatorId} onClick={() => setGenerator(g.id)} />
-              ))}
+      {categories.map((cat) => {
+        const isOpen = q ? true : !collapsed.has(cat)
+        return (
+          <div key={cat} className="mb-1">
+            <button
+              onClick={() => toggleCategory(cat)}
+              className="flex w-full items-center justify-between rounded-md px-1.5 py-1 text-[11px] font-medium text-text-muted transition-colors hover:bg-control-bg"
+            >
+              <span>{CATEGORY_LABELS[cat] ?? cat}</span>
+              <ChevronDownIcon width={12} height={12} className={`shrink-0 transition-transform duration-150 ${isOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {isOpen && (
+              <div className="flex flex-col gap-1 pb-2 pt-1">
+                {filtered
+                  .filter((g) => g.category === cat)
+                  .map((g) => (
+                    <GeneratorCard key={g.id} generator={g} active={g.id === generatorId} onClick={() => setGenerator(g.id)} />
+                  ))}
+              </div>
+            )}
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

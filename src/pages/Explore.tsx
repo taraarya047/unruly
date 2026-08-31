@@ -9,9 +9,10 @@ import { PALETTE_PRESETS } from '@/palette/presets'
 import { useDesignStore } from '@/state/useDesignStore'
 import { copySvgToClipboard } from '@/export/clipboard'
 import { useToastStore } from '@/state/useToastStore'
+import { useHistoryState } from '@/hooks/useHistoryState'
 import { AdSlot } from '@/components/ads/AdSlot'
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
-import { ShuffleIcon, PaletteIcon, CopyIcon } from '@/components/ui/icons'
+import { ShuffleIcon, PaletteIcon, CopyIcon, UndoIcon, RedoIcon } from '@/components/ui/icons'
 
 interface GalleryItem {
   generatorId: string
@@ -41,11 +42,11 @@ export function Explore() {
   const categories = ['all', ...Array.from(new Set(generatorRegistry.all().map((g) => g.category)))]
   const filtered = items.filter((item) => category === 'all' || generatorRegistry.get(item.generatorId)!.category === category)
 
-  const openInPlayground = (item: GalleryItem, paletteIndex: number) => {
+  const openInPlayground = (item: GalleryItem, seed: number, paletteIndex: number) => {
     const generator = generatorRegistry.get(item.generatorId)!
     setGenerator(generator.id)
     setParameters({ ...generator.defaultParameters })
-    setSeed(item.seed)
+    setSeed(seed)
     setPalette(PALETTE_PRESETS[paletteIndex])
     navigate('/playground')
   }
@@ -85,11 +86,19 @@ export function Explore() {
   )
 }
 
-function GalleryTile({ item, onOpen }: { item: GalleryItem; onOpen: (item: GalleryItem, paletteIndex: number) => void }) {
+interface TileState {
+  seed: number
+  paletteIndex: number
+}
+
+function GalleryTile({ item, onOpen }: { item: GalleryItem; onOpen: (item: GalleryItem, seed: number, paletteIndex: number) => void }) {
   const generator = generatorRegistry.get(item.generatorId)!
   const show = useToastStore((s) => s.show)
-  const [seed, setSeed] = useState(item.seed)
-  const [paletteIndex, setPaletteIndex] = useState(item.paletteIndex)
+  const { value: tile, push, back, forward, canBack, canForward } = useHistoryState<TileState>({
+    seed: item.seed,
+    paletteIndex: item.paletteIndex,
+  })
+  const { seed, paletteIndex } = tile
   const palette = PALETTE_PRESETS[paletteIndex]
 
   const design = useMemo(() => generator.generate(generator.defaultParameters, seed, palette.colors), [generator, seed, palette])
@@ -98,12 +107,23 @@ function GalleryTile({ item, onOpen }: { item: GalleryItem; onOpen: (item: Galle
   const evolve = (e: MouseEvent) => {
     e.stopPropagation()
     const [variation] = generateVariations(generator, generator.defaultParameters, 1, 0.2)
-    setSeed(variation.seed)
+    push({ seed: variation.seed, paletteIndex })
   }
 
   const recolor = (e: MouseEvent) => {
     e.stopPropagation()
-    setPaletteIndex((i) => (i + 1 + Math.floor(Math.random() * (PALETTE_PRESETS.length - 1))) % PALETTE_PRESETS.length)
+    const nextIndex = (paletteIndex + 1 + Math.floor(Math.random() * (PALETTE_PRESETS.length - 1))) % PALETTE_PRESETS.length
+    push({ seed, paletteIndex: nextIndex })
+  }
+
+  const goBack = (e: MouseEvent) => {
+    e.stopPropagation()
+    back()
+  }
+
+  const goForward = (e: MouseEvent) => {
+    e.stopPropagation()
+    forward()
   }
 
   const copyToFigma = async (e: MouseEvent) => {
@@ -115,12 +135,14 @@ function GalleryTile({ item, onOpen }: { item: GalleryItem; onOpen: (item: Galle
 
   return (
     <div className="group relative overflow-hidden rounded-xl border border-border transition-transform duration-200 hover:scale-[1.02]">
-      <button onClick={() => onOpen(item, paletteIndex)} className="block w-full" style={{ background: palette.background }}>
+      <button onClick={() => onOpen(item, seed, paletteIndex)} className="block w-full" style={{ background: palette.background }}>
         {/* eslint-disable-next-line react/no-danger */}
         <div dangerouslySetInnerHTML={{ __html: markup }} />
       </button>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-end gap-1 bg-gradient-to-t from-black/50 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
         <div className="pointer-events-auto flex items-center gap-1">
+          {canBack && <TileAction label="Previous" onClick={goBack} icon={<UndoIcon width={14} height={14} />} />}
+          {canForward && <TileAction label="Next" onClick={goForward} icon={<RedoIcon width={14} height={14} />} />}
           <TileAction label="Evolve" onClick={evolve} icon={<ShuffleIcon width={14} height={14} />} />
           <TileAction label="Recolor" onClick={recolor} icon={<PaletteIcon width={14} height={14} />} />
           <TileAction label="Copy to Figma" onClick={copyToFigma} icon={<CopyIcon width={14} height={14} />} />
