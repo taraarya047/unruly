@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import type { GeneratedDesign } from '@/engine/types'
-import { renderDesignToSvgString } from '@/engine/render'
 import { cleanSvg } from '@/export/clean'
 import { copySvgToClipboard } from '@/export/clipboard'
 import { downloadBlob, downloadTextFile, rasterizeSvg } from '@/export/download'
@@ -11,11 +9,14 @@ import { CopyIcon, DownloadIcon, ChevronDownIcon, CheckIcon } from '@/components
 const isMac = typeof navigator !== 'undefined' && /Mac/.test(navigator.platform)
 
 interface ExportMenuProps {
-  design: GeneratedDesign
-  background: string
+  /** Returns a complete, standalone <svg>...</svg> string at `width`x`height`. */
+  buildSvg: () => string
+  width: number
+  height: number
+  filenameBase: string
 }
 
-export function ExportMenu({ design, background }: ExportMenuProps) {
+export function ExportMenu({ buildSvg, width, height, filenameBase }: ExportMenuProps) {
   const [open, setOpen] = useState(false)
   const [justCopied, setJustCopied] = useState(false)
   const [scale, setScale] = useState(2)
@@ -32,32 +33,32 @@ export function ExportMenu({ design, background }: ExportMenuProps) {
     return () => document.removeEventListener('mousedown', onClick)
   }, [open])
 
-  function buildSvg() {
-    const svg = renderDesignToSvgString(design, { background })
+  function finalSvg() {
+    const svg = buildSvg()
     return clean ? cleanSvg(svg) : svg
   }
 
   async function handleCopyFigma() {
-    await copySvgToClipboard(buildSvg())
+    await copySvgToClipboard(finalSvg())
     setJustCopied(true)
     show(`Copied! Paste it into Figma with ${isMac ? '⌘V' : 'Ctrl+V'}.`)
     setTimeout(() => setJustCopied(false), 1800)
   }
 
   async function handleCopySvg() {
-    await copySvgToClipboard(buildSvg())
+    await copySvgToClipboard(finalSvg())
     show('SVG copied to clipboard')
   }
 
   function handleDownloadSvg() {
-    downloadTextFile(`${design.metadata.generatorId}-${design.seed}.svg`, buildSvg())
+    downloadTextFile(`${filenameBase}.svg`, finalSvg())
     show('SVG downloaded')
   }
 
   async function handleDownloadRaster(kind: 'png' | 'webp') {
-    const svg = buildSvg()
-    const blob = await rasterizeSvg(svg, design.width, design.height, scale, kind === 'png' ? 'image/png' : 'image/webp')
-    downloadBlob(`${design.metadata.generatorId}-${design.seed}@${scale}x.${kind}`, blob)
+    const svg = finalSvg()
+    const blob = await rasterizeSvg(svg, width, height, scale, kind === 'png' ? 'image/png' : 'image/webp')
+    downloadBlob(`${filenameBase}@${scale}x.${kind}`, blob)
     show(`${kind.toUpperCase()} downloaded`)
   }
 

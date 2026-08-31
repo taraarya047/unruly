@@ -4,6 +4,7 @@ import { useThemeStore } from '@/state/useThemeStore'
 import { useSavedStore } from '@/state/useSavedStore'
 import { useCurrentDesign } from '@/hooks/useCurrentDesign'
 import { generatorRegistry } from '@/engine/registry'
+import { renderDesignToSvgString } from '@/engine/render'
 import { IconButton } from '@/components/ui/IconButton'
 import { ExportMenu } from '@/components/export/ExportMenu'
 import { UndoIcon, RedoIcon, SaveIcon, SunIcon, MoonIcon, HelpIcon } from '@/components/ui/icons'
@@ -51,6 +52,7 @@ export function Header() {
         </Link>
         <nav className="hidden items-center gap-1 md:flex">
           <NavItem to="/playground" label="Playground" />
+          <NavItem to="/compose" label="Compose" />
           <NavItem to="/explore" label="Explore" />
           <NavItem to="/saved" label="Saved" />
         </nav>
@@ -86,7 +88,12 @@ export function Header() {
         </IconButton>
         {isPlayground && (
           <div className="ml-2 hidden md:block">
-            <ExportMenu design={design} background={palette.background} />
+            <ExportMenu
+              buildSvg={() => renderDesignToSvgString(design, { background: palette.background })}
+              width={design.width}
+              height={design.height}
+              filenameBase={`${design.metadata.generatorId}-${design.seed}`}
+            />
           </div>
         )}
       </div>

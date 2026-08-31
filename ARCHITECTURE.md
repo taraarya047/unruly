@@ -22,11 +22,14 @@ generators/     Individual GeneratorDefinition implementations (dotField, grid, 
 
 palette/        Palette engine: presets, harmony generation, palette <-> design binding
 
-state/          zustand stores: design (generator+params+seed+palette+history), theme, saved designs
+composition/    Poster/hero/social composition engine: canvas + layout presets, fit/clip/focal transform math,
+                text-safe-zone + text-layer rendering — all pure functions, no React (mirrors engine/)
 
-components/     React UI, organized by domain (layout, ui, canvas, generator, controls, ads, compose)
+state/          zustand stores: design (generator+params+seed+palette+history), composition, theme, saved designs
 
-pages/          Route-level screens (Home, Playground, Explore, Saved, About)
+components/     React UI, organized by domain (layout, ui, canvas, generator, controls, compose, ads)
+
+pages/          Route-level screens (Home, Playground, Compose, Explore, Saved, About)
 ```
 
 The **engine** layer never imports React. `GeneratorDefinition.generate(parameters, seed)` is a pure function
@@ -56,6 +59,22 @@ and SVG export — one code path, several call sites, so wysiwyg is guaranteed b
 
 `AdSlot` is a layout-reserving placeholder component (Phase 7 wires real ad delivery). It never mounts inside
 the canvas or between a control and its label. See `AD_SYSTEM.md`.
+
+## Composition
+
+`Compose` treats the currently-generated design as a single motif and places it into a target canvas
+(poster/web/social/presentation/custom) via one unified transform: `fitMode` (cover/contain) picks a base
+scale, an optional `margin` shrinks the fit area (used by Framed), `focalX/focalY` position it like CSS
+`object-position`, and a `clipShape` (rect/circle/half) is applied via an SVG `<clipPath>`. All 8 layout
+presets (Centered, Full bleed, Corner, Diagonal, Radial, Framed, Split, Asymmetric) are just different values
+for this one set of parameters — no per-layout rendering code. See `composition/types.ts` and
+`composition/render.ts`.
+
+Text-safe zones reserve a region (left/right/center/top/bottom) of the canvas; when a text layer is enabled,
+that region gets a translucent scrim (in the background color, for legibility) plus real `<text>` elements —
+this keeps text readable and genuinely editable when pasted into Figma, but it does not yet feed back into the
+generator to literally thin out the pattern under the text (that would require generators to accept a density
+mask, noted as a future improvement rather than implemented now).
 
 ## Extensibility
 

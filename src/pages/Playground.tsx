@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useCurrentDesign } from '@/hooks/useCurrentDesign'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 import { useDesignStore } from '@/state/useDesignStore'
+import { renderDesignToSvgString } from '@/engine/render'
 import { DesignCanvas } from '@/components/canvas/DesignCanvas'
 import { GeneratorLibrary } from '@/components/generator/GeneratorLibrary'
 import { ControlPanel } from '@/components/controls/ControlPanel'
@@ -41,7 +42,12 @@ export function Playground() {
         <Button className="flex-1" icon={<PaletteIcon width={15} height={15} />} onClick={() => setMobileSheet('controls')}>
           Controls
         </Button>
-        <ExportMenu design={design} background={palette.background} />
+        <ExportMenu
+          buildSvg={() => renderDesignToSvgString(design, { background: palette.background })}
+          width={design.width}
+          height={design.height}
+          filenameBase={`${design.metadata.generatorId}-${design.seed}`}
+        />
       </div>
 
       <div className="border-t border-border bg-surface px-4 py-4">

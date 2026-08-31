@@ -23,3 +23,9 @@
 
 `DesignCanvas` and the export serializer both consume the same `GeneratedDesign` -> SVG-string function
 (`engine/render.ts`), so what the user sees in the editor is byte-identical to what gets exported.
+
+## Reused across Playground and Compose
+
+`components/export/ExportMenu.tsx` takes a `buildSvg(): string` function plus `width`/`height`/`filenameBase`
+— it doesn't know about `GeneratedDesign` at all. Playground passes `engine/render.ts`'s serializer; Compose
+passes `composition/render.ts`'s serializer. One export UI, two independent SVG sources.
