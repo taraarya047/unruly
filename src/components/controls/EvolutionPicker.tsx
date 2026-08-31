@@ -14,6 +14,7 @@ export function EvolutionPicker() {
   const palette = useDesignStore((s) => s.palette)
   const locks = useDesignStore((s) => s.locks)
   const randomizeEvolve = useDesignStore((s) => s.randomizeEvolve)
+  const layers = useDesignStore((s) => s.layers)
   const loadSnapshot = useDesignStore((s) => s.loadSnapshot)
 
   const generator = generatorRegistry.get(generatorId)!
@@ -33,7 +34,7 @@ export function EvolutionPicker() {
   }, [open])
 
   const pick = (variation: Variation) => {
-    loadSnapshot({ generatorId, parameters: variation.parameters, seed: variation.seed, palette })
+    loadSnapshot({ generatorId, parameters: variation.parameters, seed: variation.seed, palette, layers })
     setOpen(false)
   }
 

@@ -39,6 +39,7 @@ export function useKeyboardShortcuts(enabled: boolean) {
           parameters: store.parameters,
           seed: store.seed,
           palette: store.palette,
+          layers: store.layers,
         })
         useToastStore.getState().show('Saved to your library')
         return

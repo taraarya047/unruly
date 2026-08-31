@@ -4,6 +4,7 @@ import { useDesignStore } from '@/state/useDesignStore'
 import { MagicBar } from './MagicBar'
 import { ParamControl } from './ParamControl'
 import { PaletteControls } from './PaletteControls'
+import { LayerPanel } from '@/components/layers/LayerPanel'
 import { SEMANTIC_ACTIONS } from '@/engine/mutate'
 import { Toggle } from '@/components/ui/Toggle'
 import { randomSeed } from '@/engine/prng'
@@ -99,6 +100,13 @@ export function ControlPanel() {
       <div>
         <div className="mb-2 text-xs font-medium text-text-muted">Palette</div>
         <PaletteControls />
+      </div>
+
+      <div className="h-px bg-border" />
+
+      <div>
+        <div className="mb-2 text-xs font-medium text-text-muted">Layers</div>
+        <LayerPanel />
       </div>
     </div>
   )

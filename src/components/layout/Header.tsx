@@ -24,6 +24,7 @@ export function Header() {
   const parameters = useDesignStore((s) => s.parameters)
   const seed = useDesignStore((s) => s.seed)
   const palette = useDesignStore((s) => s.palette)
+  const layers = useDesignStore((s) => s.layers)
 
   const resolvedTheme = useThemeStore((s) => s.resolved)
   const setPreference = useThemeStore((s) => s.setPreference)
@@ -35,7 +36,7 @@ export function Header() {
   const generator = generatorRegistry.get(generatorId)
 
   const handleSave = () => {
-    save({ name: generator?.name ?? 'Design', generatorId, parameters, seed, palette })
+    save({ name: generator?.name ?? 'Design', generatorId, parameters, seed, palette, layers })
     show('Saved to your library')
   }
 
@@ -89,7 +90,7 @@ export function Header() {
         {isPlayground && (
           <div className="ml-2 hidden md:block">
             <ExportMenu
-              buildSvg={() => renderDesignToSvgString(design, { background: palette.background })}
+              buildSvg={() => renderDesignToSvgString(design)}
               width={design.width}
               height={design.height}
               filenameBase={`${design.metadata.generatorId}-${design.seed}`}

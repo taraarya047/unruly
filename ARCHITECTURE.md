@@ -17,6 +17,8 @@ engine/        Framework-independent generative core. No React imports.
   registry.ts      Generator registry (id -> GeneratorDefinition)
   mutate.ts        Semantic "make it..." mutation engine
   evolve.ts        Design evolution / variation tree helpers
+  composeLayers.ts Merges a generator's raw layers with the synthetic Background layer, user
+                   visibility/lock/opacity overrides, custom stacking order, and duplicated layers
 
 generators/     Individual GeneratorDefinition implementations (dotField, grid, circles, waves, blobs, ...)
 
@@ -54,6 +56,15 @@ via a memoized selector. This keeps history cheap (Rule 4 in the product spec).
 `DesignCanvas` walks `GeneratedDesign.layers` and renders semantic `<g id="...">` groups of primitives to real
 SVG elements. This same renderer is reused for: the editor canvas, generator thumbnails, the explore gallery,
 and SVG export — one code path, several call sites, so wysiwyg is guaranteed by construction.
+
+## Layers
+
+`useCurrentDesign()` (the hook Playground/Compose/export all consume) runs the generator's raw output through
+`composeLayers()` before returning it: a synthetic `background` layer is prepended (so background color is
+real, editable, exportable content — not a separate CSS/SVG-option hack), then per-layer overrides
+(visible/locked/opacity) from `useDesignStore`, a custom stacking order, and any user-duplicated layers are
+applied. The Layer Panel edits `useDesignStore`'s `layers: LayerState`, which is part of `DesignSnapshot` —
+layer edits are undoable and saveable exactly like parameter or palette changes.
 
 ## Ads
 

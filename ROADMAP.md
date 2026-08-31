@@ -12,7 +12,13 @@
       with an editable heading/body text layer, generic export reused from Playground. Layer
       hide/show/reorder/duplicate (spec §27) not yet exposed in UI — `SVGLayer` already carries the needed
       fields (`visible`/`locked`/`opacity`), just no editor for it yet.
-- [ ] **Phase 4 — Export/Figma hardening**: real-world Figma paste testing, clean-SVG mode polish.
+- [x] **Phase 4 — Export/Figma hardening + layers**: `Background` is now a first-class layer
+      (visibility/opacity respected in-canvas via a transparency checkerboard, not just on export); a real
+      Layer Panel (show/hide, lock, opacity, reorder, duplicate, delete) wired into undo/redo history. No
+      Figma access in this environment, so hardening took the form of automated validation instead: every
+      generator × every palette × full/clean export, plus every composition layout × canvas size (224 cases)
+      parsed with `DOMParser` (zero parse errors, zero external references) and one export round-tripped
+      through `<img src>` and the PNG/WebP rasterizer to confirm it renders standalone outside the app.
 - [ ] **Phase 5 — Explore**: inspiration gallery, categories, remix/evolve-from-inspiration.
 - [ ] **Phase 6 — Saved Designs**: search/filter/tags, import/export config, shareable design URLs.
 - [ ] **Phase 7 — Advertising**: real ad network integration behind the existing `AdSlot` contract.

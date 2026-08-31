@@ -9,15 +9,24 @@
 4. **Download PNG / WebP** — the SVG is drawn to an offscreen `<canvas>` at 1x/2x/3x/custom resolution and
    exported via `canvas.toBlob('image/png' | 'image/webp')`.
 
-## Serialization rules (`export/serialize.ts`)
+## Serialization rules (`engine/render.ts`, `export/clean.ts`)
 
 - Correct `viewBox` and explicit `width`/`height`.
-- Semantic groups preserved: `<g id="background">`, `<g id="primary-pattern">`, etc. — one group per
-  `SVGLayer`, in the same order the layer panel shows.
-- All gradients/defs inlined in `<defs>`, referenced by local `url(#id)` — never an external URL.
+- Semantic groups preserved: `<g id="background">`, `<g id="dots">`, etc. — one group per `SVGLayer`, including
+  the layer panel's Background/duplicate/reorder edits, in the same order the layer panel shows (`engine/composeLayers.ts`).
+- All fills/strokes are inline attributes or local `url(#id)` refs into a `<defs>` block a layout can add
+  (e.g. `composition/render.ts`'s `<clipPath>`) — never an external URL. No generator currently emits gradients.
 - No external font/image references (Copy to Figma and Download must work fully offline).
-- `Clean SVG` option strips `data-*` metadata attributes and rounds coordinates for smaller output; the
-  default export keeps metadata (generator id, seed, params) as `data-*` attributes for traceability.
+- `Clean SVG` (`export/clean.ts`) strips `data-*` metadata attributes for a smaller, presentation-only file; the
+  default export keeps metadata (generator id, seed, palette id) as `data-*` attributes for traceability.
+
+## Validated, not just assumed
+
+This environment has no Figma access, so "does it paste into Figma cleanly" is validated as: every generator ×
+every palette, in both default and Clean SVG form, plus every composition layout × canvas size — parsed with
+`DOMParser` (checked for `parsererror`, a valid `<svg>` root, and zero external references) and spot-checked by
+loading an export through `<img src>` (the strictest same-tool proxy for "another program treats this as a
+self-contained image"). All checks pass; see the Phase 4 note in `ROADMAP.md`.
 
 ## One render path
 

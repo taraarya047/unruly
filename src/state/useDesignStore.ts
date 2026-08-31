@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { GeneratorParameters, ParamGroup } from '@/engine/types'
+import type { GeneratorParameters, ParamGroup, SVGLayer } from '@/engine/types'
 import type { Palette } from '@/palette/types'
 import { randomSeed, createRng } from '@/engine/prng'
 import { generatorRegistry } from '@/engine/registry'
@@ -7,6 +7,7 @@ import '@/generators'
 import { applySemanticAction, type SemanticAction } from '@/engine/mutate'
 import { generateVariations } from '@/engine/evolve'
 import { randomizeParameters } from '@/engine/randomizeParams'
+import { defaultLayerState, type LayerState } from '@/engine/composeLayers'
 import { DEFAULT_PALETTE, PALETTE_PRESETS } from '@/palette/presets'
 import { generateHarmonyPalette } from '@/palette/harmony'
 import type { DesignPreset } from '@/presets/designPresets'
@@ -16,6 +17,7 @@ export interface DesignSnapshot {
   parameters: GeneratorParameters
   seed: number
   palette: Palette
+  layers: LayerState
 }
 
 export interface Locks {
@@ -64,6 +66,13 @@ interface DesignStoreState extends DesignSnapshot {
   applyAction: (action: SemanticAction) => void
   applyPreset: (preset: DesignPreset) => void
 
+  toggleLayerVisible: (id: string) => void
+  toggleLayerLocked: (id: string) => void
+  setLayerOpacity: (id: string, opacity: number) => void
+  duplicateLayer: (layer: SVGLayer) => void
+  deleteExtraLayer: (id: string) => void
+  setLayerOrder: (order: string[]) => void
+
   undo: () => void
   redo: () => void
   canUndo: () => boolean
@@ -81,6 +90,7 @@ function initialSnapshot(): DesignSnapshot {
     parameters: { ...generator.defaultParameters },
     seed: randomSeed(),
     palette: DEFAULT_PALETTE,
+    layers: defaultLayerState(),
   }
 }
 
@@ -108,6 +118,7 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
           parameters: { ...generator.defaultParameters },
           seed: randomSeed(),
           palette: state.palette,
+          layers: state.layers,
         }
         return { ...snapshot, ...pushHistory(state, snapshot) }
       })
@@ -116,7 +127,7 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
     setParameter: (key, value) => {
       set((state) => {
         const parameters = { ...state.parameters, [key]: value }
-        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters, seed: state.seed, palette: state.palette }
+        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters, seed: state.seed, palette: state.palette, layers: state.layers }
         return { parameters, ...pushHistory(state, snapshot) }
       })
     },
@@ -124,21 +135,21 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
     setParameters: (params) => {
       set((state) => {
         const parameters = { ...state.parameters, ...params }
-        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters, seed: state.seed, palette: state.palette }
+        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters, seed: state.seed, palette: state.palette, layers: state.layers }
         return { parameters, ...pushHistory(state, snapshot) }
       })
     },
 
     setSeed: (seed) => {
       set((state) => {
-        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed, palette: state.palette }
+        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed, palette: state.palette, layers: state.layers }
         return { seed, ...pushHistory(state, snapshot) }
       })
     },
 
     setPalette: (palette) => {
       set((state) => {
-        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed: state.seed, palette }
+        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed: state.seed, palette, layers: state.layers }
         return { palette, ...pushHistory(state, snapshot) }
       })
     },
@@ -159,7 +170,7 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
         const parameters = randomizeParameters(generator.parameterSchema, baseParams, groups, rng)
         const seed = state.locks.geometry ? state.seed : randomSeed()
         const palette = state.locks.palette ? state.palette : rng.pick(PALETTE_PRESETS)
-        const snapshot: DesignSnapshot = { generatorId, parameters, seed, palette }
+        const snapshot: DesignSnapshot = { generatorId, parameters, seed, palette, layers: state.layers }
         return { ...snapshot, ...pushHistory(state, snapshot) }
       })
     },
@@ -175,6 +186,7 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
           parameters: variation.parameters,
           seed: state.locks.geometry ? state.seed : variation.seed,
           palette: state.palette,
+          layers: state.layers,
         }
         return { ...snapshot, ...pushHistory(state, snapshot) }
       })
@@ -191,6 +203,7 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
           parameters: { ...generator.defaultParameters },
           seed: randomSeed(),
           palette: state.palette,
+          layers: state.layers,
         }
         return { ...snapshot, ...pushHistory(state, snapshot) }
       })
@@ -201,7 +214,7 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
       set((state) => {
         const rng = createRng(randomSeed())
         const palette = generateHarmonyPalette(rng)
-        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed: state.seed, palette }
+        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed: state.seed, palette, layers: state.layers }
         return { palette, ...pushHistory(state, snapshot) }
       })
     },
@@ -212,7 +225,7 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
         const rng = createRng(randomSeed())
         const generator = generatorRegistry.get(state.generatorId)!
         const parameters = randomizeParameters(generator.parameterSchema, state.parameters, new Set<ParamGroup>(['variation']), rng)
-        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters, seed: state.seed, palette: state.palette }
+        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters, seed: state.seed, palette: state.palette, layers: state.layers }
         return { parameters, ...pushHistory(state, snapshot) }
       })
     },
@@ -221,7 +234,7 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
       set((state) => {
         const generator = generatorRegistry.get(state.generatorId)!
         const parameters = applySemanticAction(generator, state.parameters, action)
-        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters, seed: state.seed, palette: state.palette }
+        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters, seed: state.seed, palette: state.palette, layers: state.layers }
         return { parameters, ...pushHistory(state, snapshot) }
       })
     },
@@ -235,8 +248,64 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
           parameters: { ...generator.defaultParameters, ...preset.parameters } as GeneratorParameters,
           seed: preset.seed ?? randomSeed(),
           palette: preset.palette,
+          layers: state.layers,
         }
         return { ...snapshot, ...pushHistory(state, snapshot) }
+      })
+    },
+
+    toggleLayerVisible: (id) => {
+      set((state) => {
+        const current = state.layers.overrides[id] ?? {}
+        const wasVisible = current.visible ?? true
+        const layers: LayerState = { ...state.layers, overrides: { ...state.layers.overrides, [id]: { ...current, visible: !wasVisible } } }
+        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed: state.seed, palette: state.palette, layers }
+        return { layers, ...pushHistory(state, snapshot) }
+      })
+    },
+
+    toggleLayerLocked: (id) => {
+      set((state) => {
+        const current = state.layers.overrides[id] ?? {}
+        const wasLocked = current.locked ?? false
+        const layers: LayerState = { ...state.layers, overrides: { ...state.layers.overrides, [id]: { ...current, locked: !wasLocked } } }
+        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed: state.seed, palette: state.palette, layers }
+        return { layers, ...pushHistory(state, snapshot) }
+      })
+    },
+
+    setLayerOpacity: (id, opacity) => {
+      set((state) => {
+        const current = state.layers.overrides[id] ?? {}
+        const layers: LayerState = { ...state.layers, overrides: { ...state.layers.overrides, [id]: { ...current, opacity } } }
+        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed: state.seed, palette: state.palette, layers }
+        return { layers, ...pushHistory(state, snapshot) }
+      })
+    },
+
+    duplicateLayer: (layer) => {
+      set((state) => {
+        const id = `dup-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+        const copy: SVGLayer = { ...layer, id, name: `${layer.name} copy` }
+        const layers: LayerState = { ...state.layers, extraLayers: [...state.layers.extraLayers, copy] }
+        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed: state.seed, palette: state.palette, layers }
+        return { layers, ...pushHistory(state, snapshot) }
+      })
+    },
+
+    deleteExtraLayer: (id) => {
+      set((state) => {
+        const layers: LayerState = { ...state.layers, extraLayers: state.layers.extraLayers.filter((l) => l.id !== id) }
+        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed: state.seed, palette: state.palette, layers }
+        return { layers, ...pushHistory(state, snapshot) }
+      })
+    },
+
+    setLayerOrder: (order) => {
+      set((state) => {
+        const layers: LayerState = { ...state.layers, order }
+        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed: state.seed, palette: state.palette, layers }
+        return { layers, ...pushHistory(state, snapshot) }
       })
     },
 

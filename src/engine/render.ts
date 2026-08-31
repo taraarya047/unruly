@@ -26,18 +26,19 @@ export function renderDesignInner(design: GeneratedDesign): string {
 
 export interface RenderOptions {
   includeMetadata?: boolean
-  background?: string | null
   /** 'fixed' emits explicit pixel width/height (for export); 'fill' emits 100%/100% to scale to its container (for on-screen canvas use). */
   sizeMode?: 'fixed' | 'fill'
 }
 
-/** Full standalone <svg>...</svg> document string, suitable for clipboard/export/thumbnails. */
+/**
+ * Full standalone <svg>...</svg> document string, suitable for clipboard/export/thumbnails.
+ * Background is just the design's own 'background' layer (see engine/composeLayers.ts) — no separate option.
+ */
 export function renderDesignToSvgString(design: GeneratedDesign, options: RenderOptions = {}): string {
-  const { includeMetadata = true, background = null, sizeMode = 'fixed' } = options
+  const { includeMetadata = true, sizeMode = 'fixed' } = options
   const meta = includeMetadata
     ? ` data-generator="${design.metadata.generatorId}" data-seed="${design.seed}" data-palette="${design.metadata.paletteId}"`
     : ''
-  const bg = background ? `<rect width="${design.width}" height="${design.height}" fill="${background}" />` : ''
   const dims = sizeMode === 'fill' ? `width="100%" height="100%"` : `width="${design.width}" height="${design.height}"`
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${design.width} ${design.height}" ${dims}${meta}>${bg}${renderDesignInner(design)}</svg>`
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${design.width} ${design.height}" ${dims}${meta}>${renderDesignInner(design)}</svg>`
 }

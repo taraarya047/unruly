@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { generatorRegistry } from '@/engine/registry'
 import { renderDesignToSvgString } from '@/engine/render'
+import { composeLayers, defaultLayerState } from '@/engine/composeLayers'
 import { useSavedStore, type SavedDesign } from '@/state/useSavedStore'
 import { useDesignStore } from '@/state/useDesignStore'
 import { Button } from '@/components/ui/Button'
@@ -44,23 +45,24 @@ function StartButton() {
 function SavedCard({ design }: { design: SavedDesign }) {
   const navigate = useNavigate()
   const remove = useSavedStore((s) => s.remove)
-  const setGenerator = useDesignStore((s) => s.setGenerator)
-  const setParameters = useDesignStore((s) => s.setParameters)
-  const setSeed = useDesignStore((s) => s.setSeed)
-  const setPalette = useDesignStore((s) => s.setPalette)
+  const loadSnapshot = useDesignStore((s) => s.loadSnapshot)
 
   const generator = generatorRegistry.get(design.generatorId)
   const markup = useMemo(() => {
     if (!generator) return ''
     const rendered = generator.generate(design.parameters, design.seed, design.palette.colors)
-    return renderDesignToSvgString(rendered, { includeMetadata: false, sizeMode: 'fill' })
+    const composed = composeLayers(rendered, design.palette, design.layers ?? defaultLayerState())
+    return renderDesignToSvgString(composed, { includeMetadata: false, sizeMode: 'fill' })
   }, [generator, design])
 
   const open = () => {
-    setGenerator(design.generatorId)
-    setParameters(design.parameters)
-    setSeed(design.seed)
-    setPalette(design.palette)
+    loadSnapshot({
+      generatorId: design.generatorId,
+      parameters: design.parameters,
+      seed: design.seed,
+      palette: design.palette,
+      layers: design.layers ?? defaultLayerState(),
+    })
     navigate('/playground')
   }
 

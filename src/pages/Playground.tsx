@@ -43,7 +43,7 @@ export function Playground() {
           Controls
         </Button>
         <ExportMenu
-          buildSvg={() => renderDesignToSvgString(design, { background: palette.background })}
+          buildSvg={() => renderDesignToSvgString(design)}
           width={design.width}
           height={design.height}
           filenameBase={`${design.metadata.generatorId}-${design.seed}`}

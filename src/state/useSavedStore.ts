@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import type { GeneratorParameters } from '@/engine/types'
 import type { Palette } from '@/palette/types'
+import type { LayerState } from '@/engine/composeLayers'
 
 export interface SavedDesign {
   id: string
@@ -9,6 +10,8 @@ export interface SavedDesign {
   parameters: GeneratorParameters
   seed: number
   palette: Palette
+  /** Optional for backward compatibility with designs saved before the layer system existed. */
+  layers?: LayerState
   createdAt: number
   updatedAt: number
 }
