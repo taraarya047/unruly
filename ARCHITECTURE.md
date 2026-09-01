@@ -129,6 +129,31 @@ again. Every fixed-height panel this size (asides, `TimelinePanel`) additionally
 in the right places for the same underlying reason: flex items default to `min-height: auto`, which fights
 a `height`/`overflow` constraint the same way.
 
+## SEO / sharing metadata
+
+Two separate mechanisms, because this is a client-only SPA with no server/SSR — there's no single place
+that can serve different metadata per route to every kind of consumer:
+
+- **`index.html`'s static `<meta>`/`og:*`/`twitter:*` tags** are the ceiling for anything that reads the raw
+  HTML response without executing JS — link-preview bots (Slack, Discord, iMessage, Twitter/X, most of
+  Facebook/LinkedIn's crawler). These are necessarily the same for every route; there's no way to give a
+  specific `/playground?d=...` share link its own preview image without a server to render one per-request.
+  `og:url`/`canonical` currently point at a placeholder `https://unruly.design/` — swap this for the real
+  production domain before relying on these tags for anything.
+- **`hooks/useDocumentMeta.ts`** updates the live `document.title` / meta-description per route (and, on
+  Playground, per current generator) for anything that reads the live DOM instead — the browser tab/history
+  entry, bookmarking, the Web Share API. It does not help crawlers that don't run JS, but Google's own
+  indexer does execute JS, which is also why `pages/About.tsx`'s FAQPage JSON-LD (schema.org structured
+  data, matching the FAQ content already on that page) is injected client-side via a plain `<script>` tag
+  rather than needing to live in `index.html`.
+
+`public/favicon.svg` and `public/logo.svg`/`logo-dark.svg` share their star shape with
+`components/layout/Logo.tsx` — the same mark rendered three ways (React component for in-app use, standalone
+SVG favicon, standalone SVG lockup for external embeds). `public/og-image.png` is a rasterized 1200×630
+composite of that same mark, generated once via a canvas script (not hand-designed pixel-by-pixel) — there's
+no build step that regenerates it, so if the wordmark/tagline/colors change again, it needs re-generating by
+hand the same way.
+
 ## Extensibility
 
 Adding a generator = adding one file that exports a `GeneratorDefinition` and registering it in

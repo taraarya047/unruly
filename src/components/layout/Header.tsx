@@ -8,6 +8,7 @@ import { generatorRegistry } from '@/engine/registry'
 import { renderDesignToSvgString } from '@/engine/render'
 import { IconButton } from '@/components/ui/IconButton'
 import { ExportMenu } from '@/components/export/ExportMenu'
+import { Logo } from './Logo'
 import { UndoIcon, RedoIcon, SaveIcon, SunIcon, MoonIcon, HelpIcon, LinkIcon, TimelineIcon } from '@/components/ui/icons'
 import { useUIStore } from '@/state/useUIStore'
 import { useToastStore } from '@/state/useToastStore'
@@ -55,11 +56,7 @@ export function Header() {
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-surface/90 px-4 backdrop-blur-sm md:px-6">
       <div className="flex items-center gap-6">
         <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight text-text">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-accent-foreground">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M12 3l2.2 6.8H21l-5.6 4.1L17.6 21 12 16.9 6.4 21l2.2-7.1L3 9.8h6.8L12 3Z" fill="currentColor" />
-            </svg>
-          </span>
+          <Logo />
           Unruly
         </Link>
         <nav className="hidden items-center gap-1 md:flex">
@@ -67,6 +64,7 @@ export function Header() {
           <NavItem to="/compose" label="Compose" />
           <NavItem to="/explore" label="Explore" />
           <NavItem to="/saved" label="Saved" />
+          <NavItem to="/about" label="About" />
         </nav>
       </div>
 

@@ -9,10 +9,12 @@ import { useDesignStore } from '@/state/useDesignStore'
 import { serializeDesignFile, parseDesignFile } from '@/export/designFile'
 import { downloadTextFile } from '@/export/download'
 import { useToastStore } from '@/state/useToastStore'
+import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { Button } from '@/components/ui/Button'
 import { TrashIcon, SparkleIcon, CopyIcon, DownloadIcon, PlusIcon, CloseIcon } from '@/components/ui/icons'
 
 export function Saved() {
+  useDocumentMeta('Saved designs — Unruly', 'Your saved parametric designs — search, tag, duplicate, and reopen anything you’ve made.')
   const designs = useSavedStore((s) => s.designs)
   const importDesign = useSavedStore((s) => s.importDesign)
   const show = useToastStore((s) => s.show)

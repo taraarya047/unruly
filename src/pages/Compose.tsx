@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useCurrentDesign } from '@/hooks/useCurrentDesign'
+import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useDesignStore } from '@/state/useDesignStore'
 import { useCompositionStore } from '@/state/useCompositionStore'
 import { generatorRegistry } from '@/engine/registry'
@@ -14,6 +15,10 @@ import { Button } from '@/components/ui/Button'
 import { PaletteIcon } from '@/components/ui/icons'
 
 export function Compose() {
+  useDocumentMeta(
+    'Compose — Unruly',
+    'Turn a generated design into a poster, hero image, or social graphic — pick a canvas size and layout, add text, and export.',
+  )
   const design = useCurrentDesign()
   const palette = useDesignStore((s) => s.palette)
   const generatorId = useDesignStore((s) => s.generatorId)

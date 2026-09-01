@@ -1,3 +1,6 @@
+import { useEffect } from 'react'
+import { useDocumentMeta } from '@/hooks/useDocumentMeta'
+
 const FAQS = [
   {
     q: 'What is parametric design?',
@@ -21,10 +24,42 @@ const FAQS = [
   },
 ]
 
+/**
+ * Injects FAQPage structured data (schema.org) so search engines can surface these Q&As directly in
+ * results — Google's indexer executes JS, so a client-injected <script type="application/ld+json">
+ * works here even though this is a client-only SPA with no SSR (unlike raw og: tags, which need to be
+ * in the initial HTML for link-preview bots that don't run JS — see index.html for those).
+ */
+function useFaqStructuredData() {
+  useEffect(() => {
+    const script = document.createElement('script')
+    script.type = 'application/ld+json'
+    script.text = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: FAQS.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    })
+    document.head.appendChild(script)
+    return () => {
+      document.head.removeChild(script)
+    }
+  }, [])
+}
+
 export function About() {
+  useDocumentMeta(
+    'About & Guides — Unruly',
+    'What is parametric design? What is an SVG, and why use it over PNG? How do design seeds work, and how do you get a generated design into Figma?',
+  )
+  useFaqStructuredData()
+
   return (
     <div className="mx-auto w-full max-w-2xl flex-1 px-5 py-16">
-      <h1 className="text-2xl font-semibold tracking-tight text-text">About</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-text">About &amp; Guides</h1>
       <p className="mt-3 text-text-muted">
         This is a playground for parametric vector design — generate, explore, evolve, and compose SVG designs, then take them straight
         into your real design workflow. It's completely free, supported by advertising, with no paywalls or locked features.

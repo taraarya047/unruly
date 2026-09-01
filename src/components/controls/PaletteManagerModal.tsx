@@ -80,7 +80,7 @@ export function PaletteManagerModal({ open, onClose, onSelect, seedForNew }: Pal
           <div className="mb-1.5 flex items-center justify-between">
             <span className="text-xs font-medium text-text-muted">Your palettes</span>
             {seedForNew && (
-              <button onClick={openNewFromSeed} className="text-xs font-medium text-accent hover:underline">
+              <button onClick={openNewFromSeed} className="text-xs font-medium text-accent-text hover:underline">
                 Save current colors as new
               </button>
             )}

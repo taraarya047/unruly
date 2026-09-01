@@ -64,7 +64,7 @@ export function PaletteControls() {
       <div>
         <div className="mb-1.5 flex items-center justify-between">
           <span className="text-xs font-medium text-text-muted">Palettes</span>
-          <button onClick={() => setManagerOpen(true)} className="text-xs font-medium text-accent hover:underline">
+          <button onClick={() => setManagerOpen(true)} className="text-xs font-medium text-accent-text hover:underline">
             Manage
           </button>
         </div>

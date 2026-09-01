@@ -9,8 +9,11 @@
   --border: #e3e0d6;
   --text: #171512;
   --text-muted: #6b6559;
-  --accent: #ff5a36;
-  --accent-foreground: #1a0e08;
+  --accent: #3355dd;
+  --accent-foreground: #ffffff;
+  /* Same as --accent here (a text-sized use of it against --bg already clears 4.5:1 — see below) —
+     dark mode is where this needs to diverge. */
+  --accent-text: var(--accent);
   --control-bg: #ece9df;
   --control-hover: #e2ded1;
   --shadow-color: 20 14% 8%;
@@ -24,8 +27,14 @@
   --border: #302e33;
   --text: #f3f1ea;
   --text-muted: #9b968f;
-  --accent: #ff7a52;
-  --accent-foreground: #1a0e08;
+  --accent: #3d5ce0;
+  --accent-foreground: #ffffff;
+  /* A royal blue dark enough for white button text to clear 4.5:1 is, by construction, too dark for
+     itself to clear 4.5:1 as plain text on this near-black background (the two constraints don't
+     overlap — verified by computing both contrast ratios directly, not eyeballed). --accent-text is a
+     lighter tint of the same hue used only where the color itself IS the text (e.g. the "Manage"
+     palette link), not a background fill. */
+  --accent-text: #7c93ff;
   --control-bg: #201f23;
   --control-hover: #2a282e;
   --shadow-color: 0 0% 0%;
@@ -44,6 +53,7 @@
   --color-text-muted: var(--text-muted);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-text: var(--accent-text);
   --color-control-bg: var(--control-bg);
   --color-control-hover: var(--control-hover);
 }

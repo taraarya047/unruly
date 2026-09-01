@@ -12,6 +12,7 @@ import { useDesignStore } from '@/state/useDesignStore'
 import { copySvgToClipboard } from '@/export/clipboard'
 import { useToastStore } from '@/state/useToastStore'
 import { useHistoryState } from '@/hooks/useHistoryState'
+import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { AdSlot } from '@/components/ads/AdSlot'
 import { Button } from '@/components/ui/Button'
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
@@ -40,6 +41,10 @@ function buildGallery(count: number): GalleryItem[] {
 }
 
 export function Explore() {
+  useDocumentMeta(
+    'Explore — Unruly',
+    'Browse curated presets and generative design examples across 52 generators. Click anything to open, remix, or copy it to Figma.',
+  )
   const navigate = useNavigate()
   const setGenerator = useDesignStore((s) => s.setGenerator)
   const setSeed = useDesignStore((s) => s.setSeed)

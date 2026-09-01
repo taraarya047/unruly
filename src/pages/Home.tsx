@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { generatorRegistry } from '@/engine/registry'
 import { useDesignStore } from '@/state/useDesignStore'
+import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { Button } from '@/components/ui/Button'
 import { HeroCanvas } from '@/components/home/HeroCanvas'
 import { GeneratorCard } from '@/components/generator/GeneratorCard'
@@ -15,6 +16,10 @@ const DISCOVERY_PROMPTS = [
 ]
 
 export function Home() {
+  useDocumentMeta(
+    'Unruly — parametric design playground',
+    'Play with shapes, patterns, color and randomness. Create editable vector designs and take them straight to Figma.',
+  )
   const navigate = useNavigate()
   const setGenerator = useDesignStore((s) => s.setGenerator)
   const generators = generatorRegistry.all()

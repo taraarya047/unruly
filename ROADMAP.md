@@ -151,4 +151,25 @@
       `role="slider"` with arrow-key (and Home/End) scrubbing. All verified via genuine keyboard event
       dispatch (Tab, Enter, arrow keys), not just code review.
 
+- [x] **Rebrand to royal blue + favicon/logo + SEO metadata** (user-requested, outside the original phase
+      plan): `--accent` is now a royal blue (`#3355dd` light / `#3d5ce0` dark) instead of the original
+      orange, chosen and verified by computing WCAG contrast ratios directly rather than eyeballing —
+      white `--accent-foreground` text on filled accent surfaces clears AA's 4.5:1 in both themes (6.03:1 /
+      5.52:1). That same depth is, by construction, too dark to itself work as small text on the page
+      background in dark mode (the two constraints don't overlap for one hue at AA — verified this is a
+      real, not assumed, conflict); added a separate `--accent-text` token (`#7c93ff` in dark mode, 6.70:1)
+      for the two small accent-colored text links that needed it, documented in DESIGN_SYSTEM.md. Replaced
+      the unused, mismatched purple `favicon.svg` (from project scaffolding — didn't match the app's actual
+      orange-then-blue star badge at all) with the real mark; added a 32×32 PNG fallback, an apple-touch-icon,
+      and a `Logo.tsx` component so the badge exists in exactly one place. Built a proper 1200×630 OG share
+      image and full `og:*`/`twitter:*`/canonical tag set in `index.html`, plus a `useDocumentMeta` hook for
+      per-route (and per-generator, on Playground) live title/description updates — see ARCHITECTURE.md's
+      "SEO / sharing metadata" section for what each mechanism actually covers and its limits as a
+      client-only SPA. Discovered the About page already contained exactly the five educational Q&As the
+      master spec's content-strategy section asked for (parametric design, SVG, SVG-vs-PNG, seeds, Figma
+      workflow) — it just weren't linked from anywhere and had no SEO treatment; added it to the header nav,
+      gave it its own title/description, and injected schema.org FAQPage structured data (Google's indexer
+      runs JS, so this works despite no SSR). The larger §70 ask — indexable landing pages per generator
+      type (`/svg-pattern-generator` etc.) — remains a distinct, larger follow-up, not attempted here.
+
 See per-phase "what shipped" notes in commit history and end-of-phase reports.

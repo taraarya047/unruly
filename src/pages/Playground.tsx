@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useCurrentDesign } from '@/hooks/useCurrentDesign'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 import { useIsMobile } from '@/hooks/useMediaQuery'
+import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { useDesignStore } from '@/state/useDesignStore'
 import { useAnimationStore } from '@/state/useAnimationStore'
 import { renderDesignToSvgString } from '@/engine/render'
@@ -21,6 +22,10 @@ import { GridIcon, PaletteIcon, TimelineIcon } from '@/components/ui/icons'
 export function Playground() {
   useKeyboardShortcuts(true)
   const design = useCurrentDesign()
+  useDocumentMeta(
+    `${design.metadata.generatorName} — Unruly Playground`,
+    `Generate, tune, and evolve ${design.metadata.generatorName.toLowerCase()} designs live, then export as SVG, PNG, WebP, or copy straight into Figma.`,
+  )
   const palette = useDesignStore((s) => s.palette)
   const isMobile = useIsMobile()
   const timelineOpen = useAnimationStore((s) => s.panelOpen)

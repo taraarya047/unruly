@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 172 40" width="172" height="40">
+  <rect width="40" height="40" rx="10" fill="#3355dd"/>
+  <path d="M20 8l3.67 11.33H35l-9.33 6.83L29.33 35 20 28.17 10.67 35l3.66-11.84L5 19.33h11.33L20 8Z" fill="#ffffff"/>
+  <text x="52" y="28" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="26" font-weight="600" letter-spacing="-0.5" fill="#171512">Unruly</text>
+</svg>
