@@ -91,6 +91,9 @@ export const PauseIcon = (p: IconProps) => (
 export const LoopIcon = (p: IconProps) => (
   <svg {...base} {...p}><path d="M4 12a8 8 0 0 1 14-5.3L20 8" /><path d="M20 4v4h-4" /><path d="M20 12a8 8 0 0 1-14 5.3L4 16" /><path d="M4 20v-4h4" /></svg>
 )
+export const PingPongIcon = (p: IconProps) => (
+  <svg {...base} {...p}><path d="M3 9h14" /><path d="M13 5l4 4-4 4" /><path d="M21 15H7" /><path d="M11 19l-4-4 4-4" /></svg>
+)
 export const TimelineIcon = (p: IconProps) => (
   <svg {...base} {...p}><path d="M3 12h18" /><circle cx="7" cy="12" r="2.2" fill="currentColor" stroke="none" /><circle cx="14" cy="12" r="2.2" fill="currentColor" stroke="none" /><circle cx="19.5" cy="12" r="1.6" fill="currentColor" stroke="none" /></svg>
 )

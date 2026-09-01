@@ -7,7 +7,7 @@ import { useAnimationStore } from '@/state/useAnimationStore'
 import { usePlaybackLoop } from '@/hooks/usePlaybackLoop'
 import { useIsMobile } from '@/hooks/useMediaQuery'
 import { IconButton } from '@/components/ui/IconButton'
-import { PlayIcon, PauseIcon, LoopIcon, CloseIcon, TrashIcon } from '@/components/ui/icons'
+import { PlayIcon, PauseIcon, LoopIcon, PingPongIcon, CloseIcon, TrashIcon } from '@/components/ui/icons'
 import { TimelineRuler } from './TimelineRuler'
 import { TrackLane } from './TrackLane'
 import { CurveEditor } from './CurveEditor'
@@ -27,8 +27,8 @@ export function TimelinePanel() {
   const setCurrentTime = useAnimationStore((s) => s.setCurrentTime)
   const isPlaying = useAnimationStore((s) => s.isPlaying)
   const togglePlay = useAnimationStore((s) => s.togglePlay)
-  const loop = useAnimationStore((s) => s.loop)
-  const toggleLoop = useAnimationStore((s) => s.toggleLoop)
+  const playMode = useAnimationStore((s) => s.playMode)
+  const cyclePlayMode = useAnimationStore((s) => s.cyclePlayMode)
   const tracksForGenerator = useAnimationStore((s) => s.tracks[generatorId]) ?? EMPTY_TRACKS
   const selected = useAnimationStore((s) => s.selectedKeyframe)
   const selectKeyframe = useAnimationStore((s) => s.selectKeyframe)
@@ -60,8 +60,14 @@ export function TimelinePanel() {
         <IconButton label={isPlaying ? 'Pause' : 'Play'} onClick={togglePlay}>
           {isPlaying ? <PauseIcon width={16} height={16} /> : <PlayIcon width={16} height={16} />}
         </IconButton>
-        <IconButton label={loop ? 'Looping — click to play once' : 'Play once — click to loop'} active={loop} onClick={toggleLoop}>
-          <LoopIcon width={15} height={15} />
+        <IconButton
+          label={
+            playMode === 'once' ? 'Play once — click for loop' : playMode === 'loop' ? 'Looping — click for ping-pong' : 'Ping-pong — click for play once'
+          }
+          active={playMode !== 'once'}
+          onClick={cyclePlayMode}
+        >
+          {playMode === 'pingpong' ? <PingPongIcon width={15} height={15} /> : <LoopIcon width={15} height={15} />}
         </IconButton>
         <span className="w-24 shrink-0 text-xs tabular-nums text-text-muted">
           {currentTime.toFixed(2)}s / {duration.toFixed(1)}s

@@ -7,6 +7,10 @@ export interface KeyframeSelection {
   keyframeId: string
 }
 
+/** 'once' stops at the end; 'loop' jumps back to 0; 'pingpong' reverses direction at each end. */
+export type PlayMode = 'once' | 'loop' | 'pingpong'
+const PLAY_MODE_CYCLE: PlayMode[] = ['once', 'loop', 'pingpong']
+
 let idCounter = 0
 function makeKeyframeId(): string {
   idCounter += 1
@@ -18,7 +22,9 @@ interface AnimationStoreState {
   duration: number
   currentTime: number
   isPlaying: boolean
-  loop: boolean
+  playMode: PlayMode
+  /** Which way the playhead is currently advancing in ping-pong mode — internal to the playback loop. */
+  direction: 1 | -1
   /** tracks[generatorId][paramKey] = keyframes, always kept sorted by time. Animation is scoped to the
    *  base generator's own parameters — stacked generator layers aren't animatable in this iteration. */
   tracks: Record<string, Record<string, Keyframe[]>>
@@ -31,7 +37,9 @@ interface AnimationStoreState {
   play: () => void
   pause: () => void
   togglePlay: () => void
-  toggleLoop: () => void
+  setPlayMode: (mode: PlayMode) => void
+  cyclePlayMode: () => void
+  setDirection: (direction: 1 | -1) => void
 
   addTrack: (generatorId: string, paramKey: string, initialValue: number) => void
   removeTrack: (generatorId: string, paramKey: string) => void
@@ -54,7 +62,8 @@ export const useAnimationStore = create<AnimationStoreState>((set, get) => ({
   duration: 4,
   currentTime: 0,
   isPlaying: false,
-  loop: true,
+  playMode: 'loop',
+  direction: 1,
   tracks: {},
   selectedKeyframe: null,
 
@@ -62,10 +71,23 @@ export const useAnimationStore = create<AnimationStoreState>((set, get) => ({
   setPanelOpen: (open) => set({ panelOpen: open }),
   setDuration: (seconds) => set((state) => ({ duration: Math.max(0.5, seconds), currentTime: Math.min(state.currentTime, Math.max(0.5, seconds)) })),
   setCurrentTime: (time) => set((state) => ({ currentTime: Math.min(Math.max(0, time), state.duration) })),
-  play: () => set({ isPlaying: true }),
+  // Pressing play after reaching the end restarts from 0, like a video player — except in ping-pong
+  // mode, where "the end" just means the next tick reverses direction, so there's nothing to restart.
+  play: () =>
+    set((state) => (state.playMode !== 'pingpong' && state.currentTime >= state.duration - 0.001 ? { isPlaying: true, currentTime: 0, direction: 1 } : { isPlaying: true })),
   pause: () => set({ isPlaying: false }),
-  togglePlay: () => set((state) => ({ isPlaying: !state.isPlaying })),
-  toggleLoop: () => set((state) => ({ loop: !state.loop })),
+  togglePlay: () => {
+    const state = get()
+    if (state.isPlaying) set({ isPlaying: false })
+    else get().play()
+  },
+  setPlayMode: (mode) => set({ playMode: mode }),
+  cyclePlayMode: () =>
+    set((state) => {
+      const next = PLAY_MODE_CYCLE[(PLAY_MODE_CYCLE.indexOf(state.playMode) + 1) % PLAY_MODE_CYCLE.length]
+      return { playMode: next }
+    }),
+  setDirection: (direction) => set({ direction }),
 
   addTrack: (generatorId, paramKey, initialValue) => {
     set((state) => {
