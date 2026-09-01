@@ -2,12 +2,13 @@ import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useDesignStore } from '@/state/useDesignStore'
 import { useThemeStore } from '@/state/useThemeStore'
 import { useSavedStore } from '@/state/useSavedStore'
+import { useAnimationStore } from '@/state/useAnimationStore'
 import { useCurrentDesign } from '@/hooks/useCurrentDesign'
 import { generatorRegistry } from '@/engine/registry'
 import { renderDesignToSvgString } from '@/engine/render'
 import { IconButton } from '@/components/ui/IconButton'
 import { ExportMenu } from '@/components/export/ExportMenu'
-import { UndoIcon, RedoIcon, SaveIcon, SunIcon, MoonIcon, HelpIcon, LinkIcon } from '@/components/ui/icons'
+import { UndoIcon, RedoIcon, SaveIcon, SunIcon, MoonIcon, HelpIcon, LinkIcon, TimelineIcon } from '@/components/ui/icons'
 import { useUIStore } from '@/state/useUIStore'
 import { useToastStore } from '@/state/useToastStore'
 import { buildShareUrl } from '@/state/shareLink'
@@ -27,6 +28,8 @@ export function Header() {
   const palette = useDesignStore((s) => s.palette)
   const layers = useDesignStore((s) => s.layers)
   const generatorLayers = useDesignStore((s) => s.generatorLayers)
+  const timelineOpen = useAnimationStore((s) => s.panelOpen)
+  const toggleTimeline = useAnimationStore((s) => s.togglePanel)
 
   const resolvedTheme = useThemeStore((s) => s.resolved)
   const setPreference = useThemeStore((s) => s.setPreference)
@@ -86,6 +89,11 @@ export function Header() {
             <IconButton label="Copy shareable link" onClick={handleCopyLink}>
               <LinkIcon />
             </IconButton>
+            <div className="hidden md:contents">
+              <IconButton label={timelineOpen ? 'Hide animation timeline' : 'Show animation timeline'} active={timelineOpen} onClick={toggleTimeline}>
+                <TimelineIcon />
+              </IconButton>
+            </div>
             <div className="mx-1 h-6 w-px bg-border" />
           </>
         )}

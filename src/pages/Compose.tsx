@@ -22,9 +22,10 @@ export function Compose() {
   const [mobileControlsOpen, setMobileControlsOpen] = useState(false)
 
   return (
-    <div className="flex flex-1 flex-col md:h-[calc(100vh-4rem)]">
+    // md:flex-none matters here too — see the same comment in pages/Playground.tsx.
+    <div className="flex flex-1 flex-col md:h-[calc(100vh-4rem)] md:flex-none">
       <div className="flex flex-1 flex-col md:flex-row md:overflow-hidden">
-        <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-surface p-4 md:flex">
+        <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto border-r border-border bg-surface p-4 md:flex md:min-h-0">
           <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-text-muted">Composing</div>
           <div className="mb-3 text-sm font-medium text-text">{generator?.name ?? 'Design'}</div>
           <div className="mb-4 aspect-square w-full overflow-hidden rounded-xl border border-border" style={{ background: palette.background }}>
@@ -51,7 +52,7 @@ export function Compose() {
           <ComposeCanvas />
         </div>
 
-        <aside className="hidden w-80 shrink-0 border-l border-border bg-surface md:block">
+        <aside className="hidden w-80 shrink-0 border-l border-border bg-surface md:block md:min-h-0">
           <ComposeControls />
         </aside>
       </div>

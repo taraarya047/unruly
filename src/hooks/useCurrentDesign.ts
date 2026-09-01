@@ -3,15 +3,17 @@ import { generatorRegistry } from '@/engine/registry'
 import { useDesignStore } from '@/state/useDesignStore'
 import { composeLayers } from '@/engine/composeLayers'
 import { mergeGeneratorLayers } from '@/engine/composeGeneratorLayers'
+import { useAnimatedParameters } from './useAnimatedParameters'
 import type { GeneratedDesign } from '@/engine/types'
 
 export function useCurrentDesign(): GeneratedDesign {
   const generatorId = useDesignStore((s) => s.generatorId)
-  const parameters = useDesignStore((s) => s.parameters)
+  const rawParameters = useDesignStore((s) => s.parameters)
   const seed = useDesignStore((s) => s.seed)
   const palette = useDesignStore((s) => s.palette)
   const layers = useDesignStore((s) => s.layers)
   const generatorLayers = useDesignStore((s) => s.generatorLayers)
+  const parameters = useAnimatedParameters(generatorId, rawParameters)
 
   return useMemo(() => {
     const generator = generatorRegistry.get(generatorId)!

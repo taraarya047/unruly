@@ -101,4 +101,19 @@
       overrides are applied before the stacked layers are composited onto the design, so the control
       looked live but silently did nothing; fixed by excluding stacked-layer ids from that panel.
 
+- [x] **Keyframe animation timeline** (user-requested, outside the original phase plan): numeric/angle
+      generator parameters can now be animated — a bottom-docked, collapsible Timeline panel (toggled from
+      the header, desktop only) with a real transport (play/pause/loop/duration/scrubbable playhead
+      ruler), per-parameter tracks (click a lane to drop a keyframe, drag to retime), and a proper
+      cubic-bezier curve editor per keyframe (draggable handles + Linear/Ease in/Ease out/Ease in-out
+      presets) — the common video/motion-graphics timeline workflow the spec asked for. Playback is a
+      pure render-time preview (`state/useAnimationStore.ts` is entirely separate from `useDesignStore`
+      and its undo history) that flows through the same generate → composeLayers pipeline as any other
+      parameter change. While building this, found and fixed a real, previously-latent layout bug: the
+      Playground/Compose page wrapper's `flex-1` was silently making its own `md:h-[calc(100vh-4rem)]`
+      inert (flex-basis:0% from flex-1 makes an explicit height ignored by the flex algorithm), so the
+      whole page grew past the viewport instead of clamping to it the moment total content — like the new
+      256px timeline panel — exceeded it; fixed with `md:flex-none` alongside the explicit height on both
+      pages. See ARCHITECTURE.md's "Keyframe animation timeline" section for the full mechanism.
+
 See per-phase "what shipped" notes in commit history and end-of-phase reports.

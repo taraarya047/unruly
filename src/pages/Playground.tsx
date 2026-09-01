@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react'
 import { useCurrentDesign } from '@/hooks/useCurrentDesign'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 import { useDesignStore } from '@/state/useDesignStore'
+import { useAnimationStore } from '@/state/useAnimationStore'
 import { renderDesignToSvgString } from '@/engine/render'
 import { decodeShareUrl } from '@/state/shareLink'
 import { defaultLayerState } from '@/engine/composeLayers'
 import { DesignCanvas } from '@/components/canvas/DesignCanvas'
 import { GeneratorLibrary } from '@/components/generator/GeneratorLibrary'
 import { ControlPanel } from '@/components/controls/ControlPanel'
+import { TimelinePanel } from '@/components/timeline/TimelinePanel'
 import { AdSlot } from '@/components/ads/AdSlot'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { Button } from '@/components/ui/Button'
@@ -18,6 +20,7 @@ export function Playground() {
   useKeyboardShortcuts(true)
   const design = useCurrentDesign()
   const palette = useDesignStore((s) => s.palette)
+  const timelineOpen = useAnimationStore((s) => s.panelOpen)
   const [mobileSheet, setMobileSheet] = useState<'generators' | 'controls' | null>(null)
 
   useEffect(() => {
@@ -35,7 +38,11 @@ export function Playground() {
   }, [])
 
   return (
-    <div className="flex flex-1 flex-col md:h-[calc(100vh-4rem)]">
+    // md:flex-none matters: `flex-1` alone sets flex-basis:0%, which makes an explicit height inert
+    // (the flex algorithm ignores `height` once flex-basis is non-auto) — so without flex-none here,
+    // this wrapper silently grows past the viewport the moment total content (e.g. the timeline panel)
+    // exceeds it, instead of the fixed height clamping it and letting children scroll internally.
+    <div className="flex flex-1 flex-col md:h-[calc(100vh-4rem)] md:flex-none">
       <div className="flex flex-1 flex-col md:flex-row md:overflow-hidden">
         <aside className="hidden w-64 shrink-0 border-r border-border bg-surface md:block md:min-h-0">
           <GeneratorLibrary />
@@ -43,6 +50,7 @@ export function Playground() {
 
         <div className="flex min-h-[60vh] flex-1 flex-col md:min-h-0">
           <DesignCanvas design={design} background={palette.background} />
+          {timelineOpen && <TimelinePanel />}
         </div>
 
         <aside className="hidden w-72 shrink-0 border-l border-border bg-surface md:block md:min-h-0">
