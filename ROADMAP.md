@@ -18,10 +18,15 @@
       generator × every palette × full/clean export, plus every composition layout × canvas size (224 cases)
       parsed with `DOMParser` (zero parse errors, zero external references) and one export round-tripped
       through `<img src>` and the PNG/WebP rasterizer to confirm it renders standalone outside the app.
-- [~] **Phase 5 — Explore** (partial): gallery tiles now evolve/recolor/copy-to-Figma in place on hover,
-      no navigation required — the "evolve/remix from inspiration" loop from the spec. Still a lightweight
-      deterministic gallery (24 fixed items from one seeded RNG), not a browsable/paginated/curated one; no
-      preset gallery section separate from the generator gallery.
+- [x] **Phase 5 — Explore**: gallery tiles evolve/recolor/copy-to-Figma in place on hover, no navigation
+      required — the "evolve/remix from inspiration" loop from the spec, with real back/forward memory per
+      tile (see the shuffle-history entry below). A "Curated presets" section (the same `DESIGN_PRESETS`
+      used in the Playground sidebar, now also browsable here) sits above the algorithmic generator
+      gallery, giving Explore the separate curated section the spec asked for. The gallery itself is now
+      paginated ("Load more", capped at 120) instead of a fixed 24 items — `buildGallery(count)` replays
+      the same seeded RNG stream from the start each time, so a bigger count's first N items are always
+      identical to the smaller count's, making "Load more" a pure re-slice with no separate per-page seed
+      bookkeeping and no risk of the newly-revealed items silently reshuffling the ones already on screen.
 - [x] **Phase 6 — Saved Designs**: search by name, inline rename, duplicate (store actions existed since
       Phase 1, wired to UI in this phase). Shareable design URLs (`state/shareLink.ts` — base64url-encodes
       `{generator, parameters, seed, palette}` into `?d=`, decoded and hydrated on Playground load).
