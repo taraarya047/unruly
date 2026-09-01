@@ -31,6 +31,20 @@ export function TimelineRuler({ duration, currentTime, pixelsPerSecond, onScrub 
     onScrub(timeFromClientX(e.clientX))
   }
 
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault()
+      const step = (e.shiftKey ? 1 : 0.1) * (e.key === 'ArrowLeft' ? -1 : 1)
+      onScrub(Math.min(duration, Math.max(0, currentTime + step)))
+    } else if (e.key === 'Home') {
+      e.preventDefault()
+      onScrub(0)
+    } else if (e.key === 'End') {
+      e.preventDefault()
+      onScrub(duration)
+    }
+  }
+
   const tickStep = duration > 8 ? 1 : 0.5
   const ticks: number[] = []
   for (let t = 0; t <= duration + 1e-6; t += tickStep) ticks.push(t)
@@ -40,10 +54,18 @@ export function TimelineRuler({ duration, currentTime, pixelsPerSecond, onScrub 
       <div className="w-24 shrink-0 border-r border-border/60 bg-surface md:w-32" />
       <div
         ref={ref}
+        role="slider"
+        tabIndex={0}
+        aria-label="Playhead"
+        aria-valuemin={0}
+        aria-valuemax={duration}
+        aria-valuenow={Number(currentTime.toFixed(2))}
+        aria-valuetext={`${currentTime.toFixed(2)} of ${duration.toFixed(1)} seconds`}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={() => setDragging(false)}
         onPointerLeave={() => dragging && setDragging(false)}
+        onKeyDown={onKeyDown}
         className="relative h-6 flex-1 cursor-pointer touch-none border-b border-border/60 bg-surface"
         style={{ width, minWidth: '100%' }}
       >

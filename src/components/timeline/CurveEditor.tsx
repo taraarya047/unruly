@@ -77,6 +77,24 @@ export function CurveEditor({ easing, onChange }: CurveEditorProps) {
     dragging.current = null
   }
 
+  // Bare SVG shapes can't reliably take keyboard focus across browsers, so the two handles are real
+  // <button>s absolutely positioned over the SVG instead — same drag behavior, plus arrow-key nudging.
+  const handleKeyDown = (which: 'p1' | 'p2') => (e: React.KeyboardEvent) => {
+    const step = e.shiftKey ? 0.1 : 0.02
+    let dx = 0
+    let dy = 0
+    if (e.key === 'ArrowLeft') dx = -step
+    else if (e.key === 'ArrowRight') dx = step
+    else if (e.key === 'ArrowUp') dy = step
+    else if (e.key === 'ArrowDown') dy = -step
+    else return
+    e.preventDefault()
+    const point = which === 'p1' ? { x: easing.x1, y: easing.y1 } : { x: easing.x2, y: easing.y2 }
+    const x = Math.min(1, Math.max(0, point.x + dx))
+    const y = Math.min(Y_MAX, Math.max(Y_MIN, point.y + dy))
+    onChange(which === 'p1' ? { ...easing, x1: x, y1: y } : { ...easing, x2: x, y2: y })
+  }
+
   return (
     <div className="w-full shrink-0 p-2 md:w-[148px] md:border-l md:border-border">
       <div className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-text-muted">Easing</div>
@@ -91,24 +109,42 @@ export function CurveEditor({ easing, onChange }: CurveEditorProps) {
           </button>
         ))}
       </div>
-      <svg
-        ref={svgRef}
-        width={SIZE}
-        height={SIZE}
-        onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onPointerLeave={endDrag}
-        className="touch-none rounded-lg border border-border bg-control-bg/40"
-      >
-        <line x1={origin.px} y1={origin.py} x2={dest.px} y2={dest.py} stroke="var(--border)" strokeDasharray="2 2" />
-        <path d={curvePath} fill="none" stroke="var(--accent)" strokeWidth={2} />
-        <line x1={origin.px} y1={origin.py} x2={p1.px} y2={p1.py} stroke="var(--text-muted)" strokeWidth={1} />
-        <line x1={dest.px} y1={dest.py} x2={p2.px} y2={p2.py} stroke="var(--text-muted)" strokeWidth={1} />
-        <circle cx={origin.px} cy={origin.py} r={2.5} fill="var(--text-muted)" />
-        <circle cx={dest.px} cy={dest.py} r={2.5} fill="var(--text-muted)" />
-        <circle cx={p1.px} cy={p1.py} r={5.5} fill="var(--accent)" className="cursor-grab" onPointerDown={beginDrag('p1')} />
-        <circle cx={p2.px} cy={p2.py} r={5.5} fill="var(--accent)" className="cursor-grab" onPointerDown={beginDrag('p2')} />
-      </svg>
+      <div className="relative" style={{ width: SIZE, height: SIZE }}>
+        <svg
+          ref={svgRef}
+          width={SIZE}
+          height={SIZE}
+          onPointerMove={onPointerMove}
+          onPointerUp={endDrag}
+          onPointerLeave={endDrag}
+          className="touch-none rounded-lg border border-border bg-control-bg/40"
+        >
+          <line x1={origin.px} y1={origin.py} x2={dest.px} y2={dest.py} stroke="var(--border)" strokeDasharray="2 2" />
+          <path d={curvePath} fill="none" stroke="var(--accent)" strokeWidth={2} />
+          <line x1={origin.px} y1={origin.py} x2={p1.px} y2={p1.py} stroke="var(--text-muted)" strokeWidth={1} />
+          <line x1={dest.px} y1={dest.py} x2={p2.px} y2={p2.py} stroke="var(--text-muted)" strokeWidth={1} />
+          <circle cx={origin.px} cy={origin.py} r={2.5} fill="var(--text-muted)" />
+          <circle cx={dest.px} cy={dest.py} r={2.5} fill="var(--text-muted)" />
+        </svg>
+        {/* Real buttons instead of SVG shapes so the handles reliably take keyboard focus — arrow keys
+            nudge (Shift for a bigger step), matching the drag behavior 1:1. */}
+        <button
+          type="button"
+          aria-label={`Easing handle 1 at ${easing.x1.toFixed(2)}, ${easing.y1.toFixed(2)} — arrow keys to adjust`}
+          onPointerDown={beginDrag('p1')}
+          onKeyDown={handleKeyDown('p1')}
+          className="absolute h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none rounded-full bg-accent"
+          style={{ left: p1.px, top: p1.py }}
+        />
+        <button
+          type="button"
+          aria-label={`Easing handle 2 at ${easing.x2.toFixed(2)}, ${easing.y2.toFixed(2)} — arrow keys to adjust`}
+          onPointerDown={beginDrag('p2')}
+          onKeyDown={handleKeyDown('p2')}
+          className="absolute h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none rounded-full bg-accent"
+          style={{ left: p2.px, top: p2.py }}
+        />
+      </div>
       <div className="mt-1 text-center text-[10px] tabular-nums text-text-muted">
         cubic-bezier({easing.x1.toFixed(2)}, {easing.y1.toFixed(2)}, {easing.x2.toFixed(2)}, {easing.y2.toFixed(2)})
       </div>

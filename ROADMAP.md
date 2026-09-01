@@ -138,4 +138,17 @@
       together) are dynamic-`import()`ed on first use rather than bundled eagerly, so Vite code-splits them
       into their own chunk and every visitor who never exports an animation pays nothing for the feature.
 
+- [x] **Timeline accessibility polish**: a dedicated pass over the Timeline panel (the newest, most complex
+      interactive surface added this cycle) turned up three real keyboard-accessibility gaps, mirroring
+      exactly the kind of issue the original Phase 8 pass was built to catch. `CurveEditor`'s two bezier
+      handles were bare SVG `<circle>`s with no focus/keyboard path at all — replaced with real `<button>`s
+      absolutely positioned over the SVG (same drag behavior, plus arrow-key nudging, Shift for a bigger
+      step). `TrackLane`'s keyframe diamonds were real `<button>`s but their `onClick` only called
+      `stopPropagation()` — so a keyboard user tabbing to one and pressing Enter did nothing; fixed to
+      actually select the keyframe, and added Left/Right arrow retiming. The keyframe lane itself had no
+      keyboard way to add a keyframe (mouse-click-position only) — added Enter-to-add-at-the-current-
+      playhead-time. `TimelineRuler`'s scrub track was a plain unfocusable `<div>` — turned into a real
+      `role="slider"` with arrow-key (and Home/End) scrubbing. All verified via genuine keyboard event
+      dispatch (Tab, Enter, arrow keys), not just code review.
+
 See per-phase "what shipped" notes in commit history and end-of-phase reports.

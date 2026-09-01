@@ -136,6 +136,7 @@ export function TimelinePanel() {
                   duration={duration}
                   pixelsPerSecond={PIXELS_PER_SECOND}
                   selectedKeyframeId={selection?.paramKey === key ? selection.keyframeId : null}
+                  currentTime={currentTime}
                   onSelectKeyframe={(id) => selectKeyframe({ generatorId, paramKey: key, keyframeId: id })}
                   onAddKeyframe={(time, value) => addKeyframe(generatorId, key, time, value)}
                   onMoveKeyframe={(id, time) => updateKeyframe(generatorId, key, id, { time })}
