@@ -35,8 +35,18 @@
       palette shape and rejects malformed or unrecognized files without throwing). Verified end-to-end:
       round-trip preserves tags/parameters/palette with a fresh id, and three invalid-input cases (malformed
       JSON, wrong shape, unknown generator id) all correctly rejected.
-- [ ] **Phase 7 — Advertising**: real ad network integration behind the existing `AdSlot` contract. Needs
-      actual ad-network accounts/SDKs this environment doesn't have — skipped, not attempted.
+- [~] **Phase 7 — Advertising** (partial): everything the spec asked for except real ad delivery. `AdSlot`
+      is now a real loading/filled/failed state machine (a pulsing skeleton, then either the placeholder
+      "Advertisement" fill or a silently-empty reserved slot — never a layout shift, in any state); the one
+      function standing in for a real ad SDK's load call (`loadAdStub`) simulates realistic latency and an
+      occasional fill failure specifically so the failed state is a real, exercised path rather than
+      untested code. Built the measurement layer the spec called for (`state/useAnalyticsStore.ts`, a
+      capped local event log, no backend to send it to yet): ad viewability via a real `IntersectionObserver`
+      against the IAB 50%-for-1s standard, page-wide Cumulative Layout Shift via the real
+      `PerformanceObserver` Layout Instability API, session duration, export conversion (every `ExportMenu`
+      action), and generator usage (`GeneratorLibrary` selections) — every metric is a real measurement of
+      real interactions, not simulated data. What's still blocked: actual ad network accounts/SDKs this
+      environment doesn't have, so no real ad ever renders in the slot.
 - [x] **Phase 8 — Polish**: found and fixed real issues rather than a cosmetic pass —
       (1) **Accessibility**: added a global `:focus-visible` ring (nothing had one before), fixed the Home
       hero mutator (a clickable `div` with no keyboard support — now a real `<button>`), added Escape-to-close

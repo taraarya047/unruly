@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { generatorRegistry } from '@/engine/registry'
 import { useDesignStore } from '@/state/useDesignStore'
+import { trackEvent } from '@/state/useAnalyticsStore'
 import { ChevronDownIcon } from '@/components/ui/icons'
 import { GeneratorCard } from './GeneratorCard'
 import { PresetStrip } from './PresetStrip'
@@ -32,6 +33,11 @@ export function GeneratorLibrary() {
   const generators = generatorRegistry.all()
 
   const toggleCategory = (cat: string) => setExpandedCategory((prev) => (prev === cat ? null : cat))
+
+  const selectGenerator = (id: string, category: string) => {
+    setGenerator(id)
+    trackEvent('generator_selected', { generatorId: id, category })
+  }
 
   const q = query.trim().toLowerCase()
   const filtered = q
@@ -76,7 +82,7 @@ export function GeneratorLibrary() {
                 {filtered
                   .filter((g) => g.category === cat)
                   .map((g) => (
-                    <GeneratorCard key={g.id} generator={g} active={g.id === generatorId} onClick={() => setGenerator(g.id)} />
+                    <GeneratorCard key={g.id} generator={g} active={g.id === generatorId} onClick={() => selectGenerator(g.id, g.category)} />
                   ))}
               </div>
             )}

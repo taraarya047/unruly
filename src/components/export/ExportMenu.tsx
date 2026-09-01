@@ -3,6 +3,7 @@ import { cleanSvg } from '@/export/clean'
 import { copySvgToClipboard } from '@/export/clipboard'
 import { downloadBlob, downloadTextFile, rasterizeSvg } from '@/export/download'
 import { useToastStore } from '@/state/useToastStore'
+import { trackEvent } from '@/state/useAnalyticsStore'
 import { Button } from '@/components/ui/Button'
 import { CopyIcon, DownloadIcon, ChevronDownIcon, CheckIcon } from '@/components/ui/icons'
 
@@ -43,16 +44,19 @@ export function ExportMenu({ buildSvg, width, height, filenameBase }: ExportMenu
     setJustCopied(true)
     show(`Copied! Paste it into Figma with ${isMac ? '⌘V' : 'Ctrl+V'}.`)
     setTimeout(() => setJustCopied(false), 1800)
+    trackEvent('export', { format: 'figma' })
   }
 
   async function handleCopySvg() {
     await copySvgToClipboard(finalSvg())
     show('SVG copied to clipboard')
+    trackEvent('export', { format: 'svg-copy' })
   }
 
   function handleDownloadSvg() {
     downloadTextFile(`${filenameBase}.svg`, finalSvg())
     show('SVG downloaded')
+    trackEvent('export', { format: 'svg-download' })
   }
 
   async function handleDownloadRaster(kind: 'png' | 'webp') {
@@ -60,6 +64,7 @@ export function ExportMenu({ buildSvg, width, height, filenameBase }: ExportMenu
     const blob = await rasterizeSvg(svg, width, height, scale, kind === 'png' ? 'image/png' : 'image/webp')
     downloadBlob(`${filenameBase}@${scale}x.${kind}`, blob)
     show(`${kind.toUpperCase()} downloaded`)
+    trackEvent('export', { format: kind, scale })
   }
 
   return (
