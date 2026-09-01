@@ -102,18 +102,25 @@
       looked live but silently did nothing; fixed by excluding stacked-layer ids from that panel.
 
 - [x] **Keyframe animation timeline** (user-requested, outside the original phase plan): numeric/angle
-      generator parameters can now be animated — a bottom-docked, collapsible Timeline panel (toggled from
-      the header, desktop only) with a real transport (play/pause/loop/duration/scrubbable playhead
-      ruler), per-parameter tracks (click a lane to drop a keyframe, drag to retime), and a proper
-      cubic-bezier curve editor per keyframe (draggable handles + Linear/Ease in/Ease out/Ease in-out
-      presets) — the common video/motion-graphics timeline workflow the spec asked for. Playback is a
-      pure render-time preview (`state/useAnimationStore.ts` is entirely separate from `useDesignStore`
-      and its undo history) that flows through the same generate → composeLayers pipeline as any other
-      parameter change. While building this, found and fixed a real, previously-latent layout bug: the
-      Playground/Compose page wrapper's `flex-1` was silently making its own `md:h-[calc(100vh-4rem)]`
-      inert (flex-basis:0% from flex-1 makes an explicit height ignored by the flex algorithm), so the
-      whole page grew past the viewport instead of clamping to it the moment total content — like the new
-      256px timeline panel — exceeded it; fixed with `md:flex-none` alongside the explicit height on both
-      pages. See ARCHITECTURE.md's "Keyframe animation timeline" section for the full mechanism.
+      generator parameters can now be animated — a collapsible Timeline panel with a real transport
+      (play/pause/loop/duration/scrubbable playhead ruler), per-parameter tracks (click a lane to drop a
+      keyframe, drag to retime), and a proper cubic-bezier curve editor per keyframe (draggable handles +
+      Linear/Ease in/Ease out/Ease in-out presets) — the common video/motion-graphics timeline workflow the
+      spec asked for. Desktop docks it under the canvas (toggled from the header); mobile opens the same
+      `TimelinePanel` component in a `BottomSheet` (toggled from the mobile toolbar), with the curve editor
+      stacking below the tracks instead of beside them and a narrower label column to fit — one component,
+      two responsive layouts, not a separate mobile build. Playback is a pure render-time preview
+      (`state/useAnimationStore.ts` is entirely separate from `useDesignStore` and its undo history) that
+      flows through the same generate → composeLayers pipeline as any other parameter change. While
+      building this, found and fixed a real, previously-latent layout bug: the Playground/Compose page
+      wrapper's `flex-1` was silently making its own `md:h-[calc(100vh-4rem)]` inert (flex-basis:0% from
+      flex-1 makes an explicit height ignored by the flex algorithm), so the whole page grew past the
+      viewport instead of clamping to it the moment total content — like the new 256px timeline panel —
+      exceeded it; fixed with `md:flex-none` alongside the explicit height on both pages. Also found a
+      second real bug while wiring up mobile: a `hidden md:inline-flex` meant to hide the panel's own close
+      button on mobile (redundant with the sheet's own close affordance) silently lost the cascade fight
+      against `IconButton`'s hardcoded `inline-flex` base class at equal specificity, so the button stayed
+      visible; fixed by conditionally rendering it instead of fighting CSS specificity. See ARCHITECTURE.md's
+      "Keyframe animation timeline" section for the full mechanism.
 
 See per-phase "what shipped" notes in commit history and end-of-phase reports.

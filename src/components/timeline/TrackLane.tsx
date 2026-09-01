@@ -59,7 +59,7 @@ export function TrackLane({
 
   return (
     <div className="flex items-stretch border-b border-border/60">
-      <div className="flex w-32 shrink-0 items-center justify-between gap-1 border-r border-border/60 bg-surface px-2 py-1.5">
+      <div className="flex w-24 shrink-0 items-center justify-between gap-1 border-r border-border/60 bg-surface px-2 py-1.5 md:w-32">
         <span className="truncate text-xs text-text">{schema.label}</span>
         <button aria-label={`Remove ${schema.label} track`} onClick={onRemoveTrack} className="shrink-0 text-text-muted hover:text-text">
           <CloseIcon width={11} height={11} />

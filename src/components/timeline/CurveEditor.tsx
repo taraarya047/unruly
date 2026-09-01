@@ -78,7 +78,7 @@ export function CurveEditor({ easing, onChange }: CurveEditorProps) {
   }
 
   return (
-    <div className="w-[168px] shrink-0 border-l border-border p-2.5">
+    <div className="w-full shrink-0 p-2.5 md:w-[168px] md:border-l md:border-border">
       <div className="mb-2 text-[10px] font-medium uppercase tracking-wider text-text-muted">Easing</div>
       <div className="mb-2 flex flex-wrap gap-1">
         {(Object.keys(EASING_PRESETS) as EasingPresetName[]).map((name) => (

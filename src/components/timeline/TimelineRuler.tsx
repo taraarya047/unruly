@@ -37,7 +37,7 @@ export function TimelineRuler({ duration, currentTime, pixelsPerSecond, onScrub 
 
   return (
     <div className="flex">
-      <div className="w-32 shrink-0 border-r border-border/60 bg-surface" />
+      <div className="w-24 shrink-0 border-r border-border/60 bg-surface md:w-32" />
       <div
         ref={ref}
         onPointerDown={onPointerDown}

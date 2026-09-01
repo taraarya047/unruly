@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useCurrentDesign } from '@/hooks/useCurrentDesign'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
+import { useIsMobile } from '@/hooks/useMediaQuery'
 import { useDesignStore } from '@/state/useDesignStore'
 import { useAnimationStore } from '@/state/useAnimationStore'
 import { renderDesignToSvgString } from '@/engine/render'
@@ -13,14 +14,18 @@ import { TimelinePanel } from '@/components/timeline/TimelinePanel'
 import { AdSlot } from '@/components/ads/AdSlot'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { Button } from '@/components/ui/Button'
+import { IconButton } from '@/components/ui/IconButton'
 import { ExportMenu } from '@/components/export/ExportMenu'
-import { GridIcon, PaletteIcon } from '@/components/ui/icons'
+import { GridIcon, PaletteIcon, TimelineIcon } from '@/components/ui/icons'
 
 export function Playground() {
   useKeyboardShortcuts(true)
   const design = useCurrentDesign()
   const palette = useDesignStore((s) => s.palette)
+  const isMobile = useIsMobile()
   const timelineOpen = useAnimationStore((s) => s.panelOpen)
+  const toggleTimeline = useAnimationStore((s) => s.togglePanel)
+  const setTimelineOpen = useAnimationStore((s) => s.setPanelOpen)
   const [mobileSheet, setMobileSheet] = useState<'generators' | 'controls' | null>(null)
 
   useEffect(() => {
@@ -50,7 +55,11 @@ export function Playground() {
 
         <div className="flex min-h-[60vh] flex-1 flex-col md:min-h-0">
           <DesignCanvas design={design} background={palette.background} />
-          {timelineOpen && <TimelinePanel />}
+          {timelineOpen && !isMobile && (
+            <div className="flex h-64 shrink-0 flex-col border-t border-border bg-surface">
+              <TimelinePanel />
+            </div>
+          )}
         </div>
 
         <aside className="hidden w-72 shrink-0 border-l border-border bg-surface md:block md:min-h-0">
@@ -66,6 +75,9 @@ export function Playground() {
         <Button className="flex-1" icon={<PaletteIcon width={15} height={15} />} onClick={() => setMobileSheet('controls')}>
           Controls
         </Button>
+        <IconButton label={timelineOpen ? 'Hide animation timeline' : 'Show animation timeline'} active={timelineOpen} onClick={toggleTimeline}>
+          <TimelineIcon width={18} height={18} />
+        </IconButton>
         <ExportMenu
           buildSvg={() => renderDesignToSvgString(design)}
           width={design.width}
@@ -83,6 +95,9 @@ export function Playground() {
       </BottomSheet>
       <BottomSheet open={mobileSheet === 'controls'} onClose={() => setMobileSheet(null)} title="Controls">
         <ControlPanel />
+      </BottomSheet>
+      <BottomSheet open={isMobile && timelineOpen} onClose={() => setTimelineOpen(false)} title="Animation timeline">
+        <TimelinePanel />
       </BottomSheet>
     </div>
   )

@@ -5,6 +5,7 @@ import type { Keyframe } from '@/engine/easing'
 import { useDesignStore } from '@/state/useDesignStore'
 import { useAnimationStore } from '@/state/useAnimationStore'
 import { usePlaybackLoop } from '@/hooks/usePlaybackLoop'
+import { useIsMobile } from '@/hooks/useMediaQuery'
 import { IconButton } from '@/components/ui/IconButton'
 import { PlayIcon, PauseIcon, LoopIcon, CloseIcon, TrashIcon } from '@/components/ui/icons'
 import { TimelineRuler } from './TimelineRuler'
@@ -15,6 +16,7 @@ const PIXELS_PER_SECOND = 90
 const EMPTY_TRACKS: Record<string, Keyframe[]> = {}
 
 export function TimelinePanel() {
+  const isMobile = useIsMobile()
   const generatorId = useDesignStore((s) => s.generatorId)
   const parameters = useDesignStore((s) => s.parameters)
 
@@ -51,8 +53,10 @@ export function TimelinePanel() {
   const selectedKeyframeObj = selection ? tracksForGenerator[selection.paramKey]?.find((k) => k.id === selection.keyframeId) : undefined
 
   return (
-    <div className="hidden h-64 shrink-0 flex-col border-t border-border bg-surface md:flex">
-      <div className="flex items-center gap-2 border-b border-border px-3 py-2">
+    // No forced height here: on mobile this flows naturally inside BottomSheet's own scroll container;
+    // the desktop caller wraps it in a fixed h-64 box, so md:h-full/md:min-h-0 lets it fill that box.
+    <div className="flex flex-col md:h-full md:min-h-0">
+      <div className="flex flex-wrap items-center gap-2 border-b border-border px-3 py-2">
         <IconButton label={isPlaying ? 'Pause' : 'Play'} onClick={togglePlay}>
           {isPlaying ? <PauseIcon width={16} height={16} /> : <PlayIcon width={16} height={16} />}
         </IconButton>
@@ -93,13 +97,19 @@ export function TimelinePanel() {
               ))}
             </select>
           )}
-          <IconButton label="Close timeline" onClick={() => setPanelOpen(false)}>
-            <CloseIcon width={15} height={15} />
-          </IconButton>
+          {/* Mobile shows the timeline in a BottomSheet, which already has its own close affordance
+              (X + backdrop) — a second one here would be redundant, and relying on a CSS override to
+              hide it would fight IconButton's own hardcoded `inline-flex` base class at equal
+              specificity, so this is a real conditional render instead. */}
+          {!isMobile && (
+            <IconButton label="Close timeline" onClick={() => setPanelOpen(false)}>
+              <CloseIcon width={15} height={15} />
+            </IconButton>
+          )}
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1">
+      <div className="flex min-h-0 flex-1 flex-col md:flex-row">
         <div className="flex-1 overflow-auto">
           <TimelineRuler duration={duration} currentTime={currentTime} pixelsPerSecond={PIXELS_PER_SECOND} onScrub={setCurrentTime} />
           {trackedKeys.length === 0 ? (
@@ -130,7 +140,7 @@ export function TimelinePanel() {
 
         {selection && selectedKeyframeObj && (
           <div className="flex shrink-0 flex-col">
-            <div className="flex items-center gap-2 border-b border-l border-border px-2.5 py-1.5 text-xs">
+            <div className="flex items-center gap-2 border-t border-border px-2.5 py-1.5 text-xs md:border-l md:border-t-0">
               <label className="flex items-center gap-1 text-text-muted">
                 Time
                 <input
