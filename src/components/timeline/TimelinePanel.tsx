@@ -132,6 +132,7 @@ export function TimelinePanel() {
                   onAddKeyframe={(time, value) => addKeyframe(generatorId, key, time, value)}
                   onMoveKeyframe={(id, time) => updateKeyframe(generatorId, key, id, { time })}
                   onRemoveTrack={() => removeTrack(generatorId, key)}
+                  onScrubToTime={setCurrentTime}
                 />
               )
             })
@@ -155,7 +156,11 @@ export function TimelinePanel() {
                   max={duration}
                   step={0.05}
                   value={Number(selectedKeyframeObj.time.toFixed(2))}
-                  onChange={(e) => updateKeyframe(selection.generatorId, selection.paramKey, selection.keyframeId, { time: Number(e.target.value) })}
+                  onChange={(e) => {
+                    const time = Number(e.target.value)
+                    updateKeyframe(selection.generatorId, selection.paramKey, selection.keyframeId, { time })
+                    setCurrentTime(time)
+                  }}
                   className="w-14 rounded-md border border-border bg-control-bg px-1 py-0.5 text-text"
                 />
               </label>

@@ -15,6 +15,9 @@ interface TrackLaneProps {
   onAddKeyframe: (time: number, value: number) => void
   onMoveKeyframe: (keyframeId: string, time: number) => void
   onRemoveTrack: () => void
+  /** Moves the playhead — called on selecting a keyframe and while dragging one, so the canvas always
+   *  previews the frame at the keyframe currently being worked on. */
+  onScrubToTime: (time: number) => void
 }
 
 export function TrackLane({
@@ -27,6 +30,7 @@ export function TrackLane({
   onAddKeyframe,
   onMoveKeyframe,
   onRemoveTrack,
+  onScrubToTime,
 }: TrackLaneProps) {
   const laneRef = useRef<HTMLDivElement>(null)
   const width = duration * pixelsPerSecond
@@ -46,6 +50,7 @@ export function TrackLane({
   const handleKeyframePointerDown = (kf: Keyframe) => (e: React.PointerEvent) => {
     e.stopPropagation()
     onSelectKeyframe(kf.id)
+    onScrubToTime(kf.time)
     try {
       ;(e.target as Element).setPointerCapture(e.pointerId)
     } catch {
@@ -54,7 +59,9 @@ export function TrackLane({
   }
   const handleKeyframePointerMove = (kf: Keyframe) => (e: React.PointerEvent) => {
     if (e.buttons !== 1) return
-    onMoveKeyframe(kf.id, timeFromClientX(e.clientX))
+    const time = timeFromClientX(e.clientX)
+    onMoveKeyframe(kf.id, time)
+    onScrubToTime(time)
   }
 
   return (
