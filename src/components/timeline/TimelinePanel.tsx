@@ -139,7 +139,13 @@ export function TimelinePanel() {
         </div>
 
         {selection && selectedKeyframeObj && (
-          <div className="flex shrink-0 flex-col">
+          // md:overflow-y-auto matters: on desktop this column sits beside the tracks (md:flex-row)
+          // and stretches to the row's height by default, but its content (Time/Value row + curve
+          // editor SVG + readout) has a fixed min-content size that can exceed that stretched height —
+          // without its own scroll, the overflow just spills out visibly past the panel's fixed h-64
+          // instead of being reachable. Mobile isn't affected: it stacks with no height constraint,
+          // flowing naturally inside the BottomSheet's own scroll container.
+          <div className="flex shrink-0 flex-col md:overflow-y-auto">
             <div className="flex items-center gap-2 border-t border-border px-2.5 py-1.5 text-xs md:border-l md:border-t-0">
               <label className="flex items-center gap-1 text-text-muted">
                 Time

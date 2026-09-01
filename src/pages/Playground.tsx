@@ -56,7 +56,7 @@ export function Playground() {
         <div className="flex min-h-[60vh] flex-1 flex-col md:min-h-0">
           <DesignCanvas design={design} background={palette.background} />
           {timelineOpen && !isMobile && (
-            <div className="flex h-64 shrink-0 flex-col border-t border-border bg-surface">
+            <div className="flex h-96 shrink-0 flex-col border-t border-border bg-surface">
               <TimelinePanel />
             </div>
           )}

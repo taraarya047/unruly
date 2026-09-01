@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react'
 import { EASING_PRESETS, cubicBezierComponent, type BezierPoints, type EasingPresetName } from '@/engine/easing'
 
-const SIZE = 132
+const SIZE = 112
 const PAD = 12
 const PLOT = SIZE - PAD * 2
 const Y_MIN = -0.5
@@ -78,9 +78,9 @@ export function CurveEditor({ easing, onChange }: CurveEditorProps) {
   }
 
   return (
-    <div className="w-full shrink-0 p-2.5 md:w-[168px] md:border-l md:border-border">
-      <div className="mb-2 text-[10px] font-medium uppercase tracking-wider text-text-muted">Easing</div>
-      <div className="mb-2 flex flex-wrap gap-1">
+    <div className="w-full shrink-0 p-2 md:w-[148px] md:border-l md:border-border">
+      <div className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-text-muted">Easing</div>
+      <div className="mb-1.5 flex flex-wrap gap-1">
         {(Object.keys(EASING_PRESETS) as EasingPresetName[]).map((name) => (
           <button
             key={name}
@@ -109,7 +109,7 @@ export function CurveEditor({ easing, onChange }: CurveEditorProps) {
         <circle cx={p1.px} cy={p1.py} r={5.5} fill="var(--accent)" className="cursor-grab" onPointerDown={beginDrag('p1')} />
         <circle cx={p2.px} cy={p2.py} r={5.5} fill="var(--accent)" className="cursor-grab" onPointerDown={beginDrag('p2')} />
       </svg>
-      <div className="mt-1.5 text-center text-[10px] tabular-nums text-text-muted">
+      <div className="mt-1 text-center text-[10px] tabular-nums text-text-muted">
         cubic-bezier({easing.x1.toFixed(2)}, {easing.y1.toFixed(2)}, {easing.x2.toFixed(2)}, {easing.y2.toFixed(2)})
       </div>
     </div>
