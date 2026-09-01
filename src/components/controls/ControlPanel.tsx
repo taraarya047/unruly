@@ -1,6 +1,7 @@
 import { generatorRegistry } from '@/engine/registry'
 import type { ParamGroup } from '@/engine/types'
 import { useDesignStore } from '@/state/useDesignStore'
+import { useAnimationStore } from '@/state/useAnimationStore'
 import { MagicBar } from './MagicBar'
 import { ParamControl } from './ParamControl'
 import { PaletteControls } from './PaletteControls'
@@ -31,6 +32,10 @@ export function ControlPanel() {
   const applyAction = useDesignStore((s) => s.applyAction)
   const seed = useDesignStore((s) => s.seed)
   const setSeed = useDesignStore((s) => s.setSeed)
+
+  const keyframeSelection = useAnimationStore((s) => s.selectedKeyframe)
+  const animationTracks = useAnimationStore((s) => s.tracks[generatorId])
+  const updateKeyframe = useAnimationStore((s) => s.updateKeyframe)
 
   const generator = generatorRegistry.get(generatorId)!
   const visibleSchema = generator.parameterSchema.filter((p) => advancedMode || !p.advanced)
@@ -63,15 +68,34 @@ export function ControlPanel() {
           <div key={group}>
             <div className="mb-3 text-xs font-medium text-text-muted">{GROUP_LABELS[group]}</div>
             <div className="space-y-4">
-              {schemas.map((schema) => (
-                <ParamControl
-                  key={schema.key}
-                  schema={schema}
-                  value={parameters[schema.key]}
-                  onChange={(v) => setParameterLive(schema.key, v)}
-                  onCommit={(v) => setParameter(schema.key, v)}
-                />
-              ))}
+              {schemas.map((schema) => {
+                // When a keyframe is selected for this exact parameter, its animation track
+                // permanently overrides the stored parameter at render time (see
+                // hooks/useAnimatedParameters.ts) — so without this, dragging the slider would
+                // update a value the canvas never looks at, and nothing would visibly happen.
+                // Route the slider at the selected keyframe instead: show its value, edit it in place.
+                const activeKeyframe =
+                  keyframeSelection && keyframeSelection.generatorId === generatorId && keyframeSelection.paramKey === schema.key
+                    ? animationTracks?.[schema.key]?.find((k) => k.id === keyframeSelection.keyframeId)
+                    : undefined
+                return (
+                  <ParamControl
+                    key={schema.key}
+                    schema={activeKeyframe ? { ...schema, label: `${schema.label} ◆` } : schema}
+                    value={activeKeyframe ? activeKeyframe.value : parameters[schema.key]}
+                    onChange={(v) =>
+                      activeKeyframe
+                        ? updateKeyframe(generatorId, schema.key, activeKeyframe.id, { value: Number(v) })
+                        : setParameterLive(schema.key, v)
+                    }
+                    onCommit={(v) =>
+                      activeKeyframe
+                        ? updateKeyframe(generatorId, schema.key, activeKeyframe.id, { value: Number(v) })
+                        : setParameter(schema.key, v)
+                    }
+                  />
+                )
+              })}
             </div>
           </div>
         )
