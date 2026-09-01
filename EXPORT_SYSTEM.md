@@ -38,3 +38,29 @@ self-contained image"). All checks pass; see the Phase 4 note in `ROADMAP.md`.
 `components/export/ExportMenu.tsx` takes a `buildSvg(): string` function plus `width`/`height`/`filenameBase`
 — it doesn't know about `GeneratedDesign` at all. Playground passes `engine/render.ts`'s serializer; Compose
 passes `composition/render.ts`'s serializer. One export UI, two independent SVG sources.
+
+## Animation export (GIF / MP4)
+
+A separate, animation-specific export path — `export/animationExport.ts`, surfaced by
+`components/timeline/AnimationExportMenu.tsx` in the Timeline panel's transport bar (only shown once at least
+one parameter is animated). Unlike the static exports above, this one has to actually render N frames: for each
+sampled time, it recomputes animated parameters (`engine/easing.ts`'s `evaluateTrack`, the same function the
+live preview uses), regenerates the design, composes it exactly like `useCurrentDesign()` does, serializes to
+SVG, and rasterizes that to an offscreen `<canvas>` via an `Image` load — one frame at a time, fully
+deterministic, no wall-clock dependency.
+
+- **GIF** — [`gifenc`](https://github.com/mattdesl/gifenc) quantizes each frame's pixels to a palette and writes
+  it as a GIF89a frame. Untyped upstream; `src/types/gifenc.d.ts` declares just the surface this app uses.
+- **MP4** — [`mediabunny`](https://mediabunny.dev)'s `CanvasSource` feeds each rendered frame to the browser's
+  native WebCodecs `VideoEncoder` (H.264) with an explicit timestamp per frame, muxed into a real `.mp4`
+  container — no MediaRecorder real-time-capture hack, no `ffmpeg.wasm`. `canExportMp4()` feature-detects
+  WebCodecs support and the menu grays out MP4 (with an explanatory tooltip) where it's unavailable, e.g.
+  older Firefox.
+- **Ping-pong mode** exports the forward pass plus the reverse pass with both shared endpoints dropped
+  (`buildFrameTimes` in `animationExport.ts`), so the file bounces and loops seamlessly with no doubled frame
+  at either end — matching what ping-pong playback actually looks like in the editor, not just a single
+  forward pass. `once` mode sets the GIF's own loop count to play exactly once instead of looping forever.
+- **Lazy-loaded**: `mediabunny` + `gifenc` together add ~180kb gzipped — real weight every visitor would
+  otherwise pay for a feature only exporters touch. `AnimationExportMenu` imports `animationExport.ts` via
+  dynamic `import()` (once, on first open), so Vite code-splits it into its own chunk that loads only when the
+  Export menu is actually used; the main bundle is unaffected.

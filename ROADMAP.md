@@ -123,4 +123,19 @@
       visible; fixed by conditionally rendering it instead of fighting CSS specificity. See ARCHITECTURE.md's
       "Keyframe animation timeline" section for the full mechanism.
 
+- [x] **Animation export (GIF / MP4)** (user-requested, outside the original phase plan): the Timeline panel
+      gained an "Export" menu, shown once at least one parameter is animated, that renders the keyframe
+      animation to a real GIF or MP4 and downloads it — see EXPORT_SYSTEM.md's "Animation export" section for
+      the full mechanism. GIF via `gifenc` (per-frame palette quantization); MP4 via `mediabunny`, which
+      drives the browser's native WebCodecs `VideoEncoder` directly — a real H.264 `.mp4`, not a MediaRecorder
+      screen-capture hack or an `ffmpeg.wasm` build. Both formats respect the current play mode: `once`
+      exports a single forward pass (and the GIF is set to play once, not loop); `loop` exports one forward
+      pass that loops natively; `pingpong` exports the forward pass plus the reverse pass with the shared
+      endpoints dropped, so the file bounces and loops seamlessly with no doubled frame at the turn. Frame
+      rendering reuses the exact same generate → composeLayers → mergeGeneratorLayers pipeline the live
+      preview uses, just sampled at fixed timestamps instead of driven by `requestAnimationFrame`, so export
+      has no wall-clock dependency and is fully deterministic. Both encoding libraries (~180kb gzipped
+      together) are dynamic-`import()`ed on first use rather than bundled eagerly, so Vite code-splits them
+      into their own chunk and every visitor who never exports an animation pays nothing for the feature.
+
 See per-phase "what shipped" notes in commit history and end-of-phase reports.

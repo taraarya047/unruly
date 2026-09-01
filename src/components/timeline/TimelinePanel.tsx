@@ -11,6 +11,7 @@ import { PlayIcon, PauseIcon, LoopIcon, PingPongIcon, CloseIcon, TrashIcon } fro
 import { TimelineRuler } from './TimelineRuler'
 import { TrackLane } from './TrackLane'
 import { CurveEditor } from './CurveEditor'
+import { AnimationExportMenu } from './AnimationExportMenu'
 
 const PIXELS_PER_SECOND = 90
 const EMPTY_TRACKS: Record<string, Keyframe[]> = {}
@@ -85,6 +86,7 @@ export function TimelinePanel() {
           s
         </label>
         <div className="ml-auto flex items-center gap-2">
+          {trackedKeys.length > 0 && <AnimationExportMenu tracks={tracksForGenerator} />}
           {availableToAdd.length > 0 && (
             <select
               value=""
