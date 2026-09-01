@@ -39,6 +39,8 @@ const GENERATOR_OPTIONS = generatorRegistry
 export function GeneratorLayersPanel() {
   const generatorId = useDesignStore((s) => s.generatorId)
   const generatorLayers = useDesignStore((s) => s.generatorLayers)
+  const activeLayerId = useDesignStore((s) => s.activeLayerId)
+  const setActiveLayer = useDesignStore((s) => s.setActiveLayer)
   const addGeneratorLayer = useDesignStore((s) => s.addGeneratorLayer)
   const removeGeneratorLayer = useDesignStore((s) => s.removeGeneratorLayer)
   const setGeneratorLayerGenerator = useDesignStore((s) => s.setGeneratorLayerGenerator)
@@ -61,6 +63,8 @@ export function GeneratorLayersPanel() {
           layer={layer}
           isTop={i === 0}
           isBottom={i === topToBottom.length - 1}
+          isActive={layer.id === activeLayerId}
+          onSelect={() => setActiveLayer(layer.id)}
           onToggleVisible={() => toggleGeneratorLayerVisible(layer.id)}
           onGeneratorChange={(id) => setGeneratorLayerGenerator(layer.id, id)}
           onRandomize={() => randomizeGeneratorLayer(layer.id)}
@@ -73,9 +77,14 @@ export function GeneratorLayersPanel() {
         />
       ))}
 
-      <div className="rounded-lg border border-dashed border-border px-2.5 py-2 text-xs text-text-muted">
+      <button
+        onClick={() => setActiveLayer(null)}
+        className={`w-full rounded-lg border border-dashed px-2.5 py-2 text-left text-xs text-text-muted transition-colors ${
+          activeLayerId === null ? 'border-accent bg-accent/[0.06]' : 'border-border hover:border-text-muted'
+        }`}
+      >
         <span className="font-medium text-text">{baseGenerator?.name ?? 'Base'}</span> — base layer
-      </div>
+      </button>
 
       <Button size="sm" variant="ghost" className="w-full" icon={<PlusIcon width={14} height={14} />} onClick={addGeneratorLayer}>
         Add generator layer
@@ -88,6 +97,8 @@ interface RowProps {
   layer: GeneratorLayerConfig
   isTop: boolean
   isBottom: boolean
+  isActive: boolean
+  onSelect: () => void
   onToggleVisible: () => void
   onGeneratorChange: (generatorId: string) => void
   onRandomize: () => void
@@ -103,6 +114,8 @@ function GeneratorLayerRow({
   layer,
   isTop,
   isBottom,
+  isActive,
+  onSelect,
   onToggleVisible,
   onGeneratorChange,
   onRandomize,
@@ -131,7 +144,12 @@ function GeneratorLayerRow({
   }
 
   return (
-    <div className="rounded-lg border border-border bg-control-bg/50 px-2 py-1.5">
+    <div
+      onClick={onSelect}
+      className={`rounded-lg border px-2 py-1.5 transition-colors ${
+        isActive ? 'border-accent bg-accent/[0.06]' : 'border-border bg-control-bg/50 hover:border-text-muted/50'
+      }`}
+    >
       <div className="flex items-center gap-1">
         <IconButton label={layer.visible ? 'Hide layer' : 'Show layer'} onClick={onToggleVisible}>
           {layer.visible ? <EyeIcon width={15} height={15} /> : <EyeOffIcon width={15} height={15} />}

@@ -28,7 +28,7 @@ export function MagicBar() {
   const canRedo = useDesignStore((s) => s.canRedo())
 
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-2">
       <Button variant="primary" size="lg" className="w-full" icon={<ShuffleIcon width={18} height={18} />} onClick={randomizeNew}>
         Shuffle
       </Button>
@@ -45,11 +45,11 @@ export function MagicBar() {
         </Button>
       </div>
 
-      <div className="rounded-xl border border-border bg-control-bg/40 p-2.5">
+      <div className="rounded-xl border border-border bg-control-bg/40 p-2">
         <Button variant="secondary" size="sm" className="w-full" icon={<SparkleIcon width={15} height={15} />} onClick={randomizeComposition}>
           Surprise me
         </Button>
-        <label className="mt-2 flex items-center justify-between">
+        <label className="mt-1.5 flex items-center justify-between">
           <span className="text-xs text-text-muted">Chaos blending (random opacity &amp; blend modes)</span>
           <Toggle checked={chaosBlending} onChange={toggleChaosBlending} />
         </label>
@@ -64,7 +64,7 @@ export function MagicBar() {
           <RedoIcon width={16} height={16} />
         </IconButton>
       </div>
-      <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 pt-1 text-xs text-text-muted">
+      <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-text-muted">
         {LOCK_LABELS.map(({ key, label }) => (
           <LockToggle key={key} label={label} active={locks[key]} onClick={() => toggleLock(key)} />
         ))}

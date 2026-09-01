@@ -89,6 +89,14 @@ interface DesignStoreState extends DesignSnapshot {
   advancedMode: boolean
   /** When true, the "Surprise me" composition randomizer also scrambles every layer's blend mode/opacity. */
   chaosBlending: boolean
+  /**
+   * Which layer the parameter-editing controls (MagicBar "Make it...", Shape/Pattern/Variation/
+   * Composition/Color sliders, Seed) currently target — null means the base design, otherwise the id
+   * of an entry in `generatorLayers`. Purely a UI selection, not part of DesignSnapshot: it's not
+   * undoable/saveable/shareable, and undo/redo/loadSnapshot leave it untouched (a stale id just falls
+   * back to the base, see ControlPanel's `activeLayer` lookup).
+   */
+  activeLayerId: string | null
 
   setGenerator: (generatorId: string) => void
   setParameter: (key: string, value: number | string | boolean) => void
@@ -99,6 +107,7 @@ interface DesignStoreState extends DesignSnapshot {
   toggleLock: (key: keyof Locks) => void
   toggleAdvancedMode: () => void
   toggleChaosBlending: () => void
+  setActiveLayer: (id: string | null) => void
 
   randomizeNew: () => void
   randomizeEvolve: () => void
@@ -113,6 +122,9 @@ interface DesignStoreState extends DesignSnapshot {
   removeGeneratorLayer: (id: string) => void
   setGeneratorLayerGenerator: (id: string, generatorId: string) => void
   randomizeGeneratorLayer: (id: string) => void
+  setGeneratorLayerParameter: (id: string, key: string, value: number | string | boolean) => void
+  setGeneratorLayerParameterLive: (id: string, key: string, value: number | string | boolean) => void
+  setGeneratorLayerSeed: (id: string, seed: number) => void
   setGeneratorLayerOpacity: (id: string, opacity: number) => void
   setGeneratorLayerOpacityLive: (id: string, opacity: number) => void
   setGeneratorLayerBlendMode: (id: string, blendMode: BlendMode) => void
@@ -164,6 +176,7 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
     historyIndex: 0,
     advancedMode: false,
     chaosBlending: false,
+    activeLayerId: null,
 
     setGenerator: (generatorId) => {
       const generator = generatorRegistry.get(generatorId)
@@ -220,6 +233,7 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
     toggleLock: (key) => set((state) => ({ locks: { ...state.locks, [key]: !state.locks[key] } })),
     toggleAdvancedMode: () => set((state) => ({ advancedMode: !state.advancedMode })),
     toggleChaosBlending: () => set((state) => ({ chaosBlending: !state.chaosBlending })),
+    setActiveLayer: (id) => set({ activeLayerId: id }),
 
     // "Shuffle" (formerly "Surprise me") — rerolls everything not protected by a lock, one layer at a
     // time: the base design and every stacked generator layer each get their own independent reroll
@@ -333,8 +347,18 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
       })
     },
 
+    // Targets whichever layer is currently active (see `activeLayerId`) — the base design by default,
+    // or a specific stacked generator layer once the user has selected one in GeneratorLayersPanel.
     applyAction: (action) => {
       set((state) => {
+        const activeLayer = state.activeLayerId ? state.generatorLayers.find((l) => l.id === state.activeLayerId) : undefined
+        if (activeLayer) {
+          const generator = generatorRegistry.get(activeLayer.generatorId)!
+          const parameters = applySemanticAction(generator, activeLayer.parameters, action)
+          const generatorLayers = state.generatorLayers.map((l) => (l.id === activeLayer.id ? { ...l, parameters } : l))
+          const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed: state.seed, palette: state.palette, layers: state.layers, generatorLayers }
+          return { generatorLayers, ...pushHistory(state, snapshot) }
+        }
         const generator = generatorRegistry.get(state.generatorId)!
         const parameters = applySemanticAction(generator, state.parameters, action)
         const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters, seed: state.seed, palette: state.palette, layers: state.layers, generatorLayers: state.generatorLayers }
@@ -372,7 +396,7 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
       set((state) => {
         const generatorLayers = state.generatorLayers.filter((l) => l.id !== id)
         const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed: state.seed, palette: state.palette, layers: state.layers, generatorLayers }
-        return { generatorLayers, ...pushHistory(state, snapshot) }
+        return { generatorLayers, activeLayerId: state.activeLayerId === id ? null : state.activeLayerId, ...pushHistory(state, snapshot) }
       })
     },
 
@@ -394,6 +418,29 @@ export const useDesignStore = create<DesignStoreState>((set, get) => {
         const generatorLayers = state.generatorLayers.map((l) =>
           l.id === id ? { ...l, generatorId: generator.id, parameters: { ...generator.defaultParameters }, seed: randomSeed() } : l,
         )
+        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed: state.seed, palette: state.palette, layers: state.layers, generatorLayers }
+        return { generatorLayers, ...pushHistory(state, snapshot) }
+      })
+    },
+
+    setGeneratorLayerParameter: (id, key, value) => {
+      set((state) => {
+        const generatorLayers = state.generatorLayers.map((l) => (l.id === id ? { ...l, parameters: { ...l.parameters, [key]: value } } : l))
+        const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed: state.seed, palette: state.palette, layers: state.layers, generatorLayers }
+        return { generatorLayers, ...pushHistory(state, snapshot) }
+      })
+    },
+
+    // Live drag preview for a generator layer's own parameter sliders — no history entry (see setParameterLive).
+    setGeneratorLayerParameterLive: (id, key, value) => {
+      set((state) => ({
+        generatorLayers: state.generatorLayers.map((l) => (l.id === id ? { ...l, parameters: { ...l.parameters, [key]: value } } : l)),
+      }))
+    },
+
+    setGeneratorLayerSeed: (id, seed) => {
+      set((state) => {
+        const generatorLayers = state.generatorLayers.map((l) => (l.id === id ? { ...l, seed } : l))
         const snapshot: DesignSnapshot = { generatorId: state.generatorId, parameters: state.parameters, seed: state.seed, palette: state.palette, layers: state.layers, generatorLayers }
         return { generatorLayers, ...pushHistory(state, snapshot) }
       })
