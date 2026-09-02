@@ -4,6 +4,7 @@ import { Footer } from './Footer'
 import { Toaster } from '@/components/ui/Toaster'
 import { ShortcutsModal } from '@/components/help/ShortcutsModal'
 import { useAnalyticsInit } from '@/hooks/useAnalyticsInit'
+import { useGoogleAnalyticsPageview } from '@/hooks/useGoogleAnalyticsPageview'
 
 // The editor tools are fixed-height, non-scrolling app surfaces (see ARCHITECTURE.md's flex-basis note) —
 // a footer below them would either get clipped or force the whole page to scroll. Every other route is a
@@ -12,6 +13,7 @@ const NO_FOOTER_PATHS = ['/playground', '/compose']
 
 export function AppShell() {
   useAnalyticsInit()
+  useGoogleAnalyticsPageview()
   const location = useLocation()
   const showFooter = !NO_FOOTER_PATHS.includes(location.pathname)
 
