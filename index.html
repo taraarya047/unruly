@@ -1,6 +1,20 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9WLGCSHEES"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      // send_page_view is off here because this is a client-side-routed SPA: every navigation after
+      // the first is a route change, not a real page load, so a single hook
+      // (useGoogleAnalyticsPageview, mounted in AppShell) sends every page_view — including the
+      // first — instead of gtag's automatic one, so nothing is double-counted.
+      gtag('config', 'G-9WLGCSHEES', { send_page_view: false });
+    </script>
+
     <meta charset="UTF-8" />
 
     <!-- Favicon / app icons — see public/favicon.svg (source shape shared with src/components/layout/Logo.tsx) -->
