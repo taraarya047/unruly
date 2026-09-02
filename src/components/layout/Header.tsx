@@ -64,6 +64,7 @@ export function Header() {
           <NavItem to="/compose" label="Compose" />
           <NavItem to="/explore" label="Explore" />
           <NavItem to="/saved" label="Saved" />
+          <NavItem to="/guides" label="Guides" />
           <NavItem to="/about" label="About" />
         </nav>
       </div>

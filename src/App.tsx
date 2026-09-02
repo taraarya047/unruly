@@ -6,6 +6,10 @@ import { Compose } from '@/pages/Compose'
 import { Explore } from '@/pages/Explore'
 import { Saved } from '@/pages/Saved'
 import { About } from '@/pages/About'
+import { Guides } from '@/pages/Guides'
+import { GuideDetail } from '@/pages/GuideDetail'
+import { Privacy } from '@/pages/Privacy'
+import { Terms } from '@/pages/Terms'
 
 export default function App() {
   return (
@@ -18,6 +22,10 @@ export default function App() {
           <Route path="/explore" element={<Explore />} />
           <Route path="/saved" element={<Saved />} />
           <Route path="/about" element={<About />} />
+          <Route path="/guides" element={<Guides />} />
+          <Route path="/guides/:slug" element={<GuideDetail />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
         </Route>
       </Routes>
     </BrowserRouter>
