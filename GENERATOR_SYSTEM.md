@@ -68,14 +68,14 @@ Extracted once several generators needed the same non-trivial algorithm, rather 
   Sculpture, Curl Noise, and River Network, each of which only needs to supply a different
   `(x,y) => {vx,vy}` function.
 
-## Generators (81)
+## Generators (91)
 
 **Geometric**: Dot Field, Grid, Circles, Polygon Field, Checker/Tile, Hex Grid.
 **Lines**: Waves, Concentric Lines, Flow Lines, Spiral.
 **Organic**: Blobs, Mandala, Metaballs, L-System Forest, Liquid Swirl, Paper Cut, Chaos Garden, Fractal Bloom,
 Barnsley Fern, Fractal Tree Sculpture, Particle Aggregation, Crystal Growth, Lightning Network,
-River Network, Organic Vein Network.
-**Experimental**: Confetti, Halftone.
+River Network, Organic Vein Network, Reaction Diffusion, Crystalline Cellular System.
+**Experimental**: Confetti, Halftone, Displacement Map.
 **Fields**: Force Field, Magnetic Lines, Gravity Well, Vortex Field, Double Vortex, Flow Field Sculpture,
 Curl Noise.
 **Particles**: Particle Constellation, Spiral Galaxy, Particle Collision.
@@ -86,12 +86,15 @@ Tessellation.
 Radial Mandala, Geometric Flower, Radiating Sun, Mandelbrot Landscape, Julia Orbits, Koch Coastline,
 Sierpinski Architecture, Pascal Mosaic, Prime Field, Phyllotaxis, Fibonacci Spiral, Cellular Automata,
 Turing Patterns.
-**Optical**: Kaleidoscope, Impossible Stairs, Moiré, Op Art, Spatial Warp Grid.
+**Optical**: Kaleidoscope, Impossible Stairs, Moiré, Op Art, Spatial Warp Grid, Polar Distortion,
+Spherical Projection.
 **Texture**: Topographic Map, Height Field, Weaving, Pixel Mosaic, Glitch Grid, Vector Field Topography,
-Cracked Earth.
+Cracked Earth, Circuit Board.
 **Playful**: Chaos Garden, Doodle Field.
-**Architectural**: Isometric City, Abstract Floorplan.
-**Illustrative**: Stained Glass, Paper Cut, Ribbon Sculpture, Ink Splash, Magnetic Typography Field.
+**Architectural**: Isometric City, Abstract Floorplan, Isometric Terrain, Isometric Machinery,
+Procedural Blueprint.
+**Illustrative**: Stained Glass, Paper Cut, Ribbon Sculpture, Ink Splash, Magnetic Typography Field,
+Circuit Organism.
 
 (Some generators carry more than one category tag; the list above groups by primary category, matching the
 generator library sidebar.) Two spec-requested concepts — Halftone and Confetti Party — already matched
@@ -132,9 +135,28 @@ than an arbitrary vector field — its raw gradient magnitude is tiny relative t
 or the jitter completely swamps the terrain-following signal. Turing Patterns is a fast, one-shot spectral
 approximation (summed plane waves at one shared wavelength, thresholded into contours) — a real
 Gray-Scott reaction-diffusion PDE simulation is reserved for a later Reaction Diffusion generator, since
-the master spec asks for both as separate generators. The remaining phases (reaction/field systems,
-typographic/optical — see ROADMAP.md) are intentionally not implemented yet, per the expansion plan's own
-instruction not to add all 50 generators in one uncontrolled pass.
+the master spec asks for both as separate generators.
+
+**Phase 5** (reaction/field systems — Reaction Diffusion through Circuit Organism above) delivers on that
+Turing/Reaction-Diffusion distinction: Reaction Diffusion runs a genuine iterative Gray-Scott PDE
+simulation (not the spectral approximation). It surfaced two real numerical/QA bugs worth noting for
+future grid-simulation generators — the textbook-quoted Du=1/Dv=0.5 diffusion rates are unconditionally
+unstable at dt=1 with a 5-point discrete Laplacian and blow up to NaN within dozens of steps (fixed with
+the actual Pearson 1993 rates, Du=0.16/Dv=0.08), and different feed/kill presets settle at very different
+characteristic concentrations, so a single fixed contour threshold that works for one preset can sit
+entirely outside another's range and render blank (fixed the same way as Mandelbrot/Julia, by thresholding
+within the field's own observed min/max) — the same fix was needed for Turing Patterns' user-facing
+threshold slider, caught by strengthening the test harness to flag shapes whose path data is empty rather
+than trusting a non-zero shape count. Crystalline Cellular System went through a similar debugging arc:
+an initial diffusion-based vapor model reproducing Reiter's snowflake automaton either never grew past its
+seed cell (no driving term) or avalanched to near-total fill within a couple of iterations once a
+background gain term was added (positive feedback with no counterbalance) — replaced with a directly
+controllable growth-front automaton where tip cells (few frozen neighbors) freeze far more readily than
+infill cells (many frozen neighbors), which is easy to reason about and bounded by construction. Isometric
+Terrain and Isometric Machinery reuse the existing `engine/math/isometric.ts` block-drawing primitive
+Isometric City already established. The remaining phase (6: typographic/optical — see ROADMAP.md) is
+intentionally not implemented yet, per the expansion plan's own instruction not to add all 50 generators
+in one uncontrolled pass.
 
 ## Mutation & evolution
 

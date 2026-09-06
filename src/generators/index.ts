@@ -80,6 +80,16 @@ import { riverNetworkGenerator } from './riverNetwork'
 import { organicVeinNetworkGenerator } from './organicVeinNetwork'
 import { cellularAutomataGenerator } from './cellularAutomata'
 import { turingPatternsGenerator } from './turingPatterns'
+import { reactionDiffusionGenerator } from './reactionDiffusion'
+import { crystallineCellularSystemGenerator } from './crystallineCellularSystem'
+import { displacementMapGenerator } from './displacementMap'
+import { polarDistortionGenerator } from './polarDistortion'
+import { sphericalProjectionGenerator } from './sphericalProjection'
+import { isometricTerrainGenerator } from './isometricTerrain'
+import { isometricMachineryGenerator } from './isometricMachinery'
+import { proceduralBlueprintGenerator } from './proceduralBlueprint'
+import { circuitBoardGenerator } from './circuitBoard'
+import { circuitOrganismGenerator } from './circuitOrganism'
 
 const ALL_GENERATORS = [
   dotFieldGenerator,
@@ -163,6 +173,16 @@ const ALL_GENERATORS = [
   organicVeinNetworkGenerator,
   cellularAutomataGenerator,
   turingPatternsGenerator,
+  reactionDiffusionGenerator,
+  crystallineCellularSystemGenerator,
+  displacementMapGenerator,
+  polarDistortionGenerator,
+  sphericalProjectionGenerator,
+  isometricTerrainGenerator,
+  isometricMachineryGenerator,
+  proceduralBlueprintGenerator,
+  circuitBoardGenerator,
+  circuitOrganismGenerator,
 ]
 
 export function registerGenerators() {

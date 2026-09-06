@@ -1,6 +1,6 @@
 import type { GeneratorDefinition, StyledShape } from '@/engine/types'
 import { createRng } from '@/engine/prng'
-import { sampleGrid, marchingSquaresFromGrid, segmentsToPathD } from '@/engine/math/marchingSquares'
+import { sampleGrid, marchingSquaresFromGrid, segmentsToPathD, gridValueRange } from '@/engine/math/marchingSquares'
 
 const WIDTH = 800
 const HEIGHT = 800
@@ -55,7 +55,13 @@ export const turingPatternsGenerator: GeneratorDefinition = {
 
     const field = buildField(rng, modeCount, wavelength, alignment)
     const grid = sampleGrid(field, WIDTH, HEIGHT, RESOLUTION)
-    const segments = marchingSquaresFromGrid(grid, threshold)
+    // Averaging more modes narrows the field's actual range well inside [-1, 1] (central-limit-like
+    // behavior) — clamp the user's threshold into the field's real observed range so it always crosses
+    // somewhere, rather than silently rendering blank whenever it falls outside that shrunken range.
+    const { min: vMin, max: vMax } = gridValueRange(grid)
+    const margin = (vMax - vMin) * 0.05
+    const clampedThreshold = Math.min(vMax - margin, Math.max(vMin + margin, threshold))
+    const segments = marchingSquaresFromGrid(grid, clampedThreshold)
 
     const shapes: StyledShape[] = [
       {

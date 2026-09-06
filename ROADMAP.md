@@ -240,4 +240,29 @@
       direction before blending in jitter). Remaining phases (5: reaction/field systems, 6: typographic/
       optical) are intentionally not started yet.
 
+- [x] **Advanced generator expansion, Phase 5 of 6 — reaction & field systems**: added 10 generators —
+      Reaction Diffusion, Crystalline Cellular System, Displacement Map, Polar Distortion, Spherical
+      Projection, Isometric Terrain, Isometric Machinery, Procedural Blueprint, Circuit Board, Circuit
+      Organism (81 → 91 total). Reaction Diffusion is a genuine iterative Gray-Scott simulation (the
+      Turing Patterns spectral approximation from Phase 4 was deliberately not this). Two grid-simulation
+      generators needed real debugging beyond what the determinism harness alone caught:
+      - Reaction Diffusion initially blew up to NaN within dozens of steps — the commonly *quoted*
+        Du=1/Dv=0.5 diffusion rates are unconditionally unstable at dt=1 with a 5-point discrete
+        Laplacian; fixed with the actual Pearson (1993) rates (Du=0.16/Dv=0.08). It also rendered blank
+        for some feed/kill presets (a fixed contour threshold sat outside that preset's actual
+        concentration range) — fixed the same way as Mandelbrot/Julia's earlier threshold fix, by
+        thresholding within the field's own observed min/max. The same threshold-range bug turned up in
+        Turing Patterns' user-facing "Threshold" slider once the test harness was strengthened to check
+        for empty path data instead of trusting a non-zero shape count (a design that had 1 "shape" whose
+        path `d` was an empty string was passing every prior check).
+      - Crystalline Cellular System's first implementation (a diffusion-based vapor model, adapted from
+        Reiter's snowflake automaton) either never grew past its single seed cell or avalanched to
+        near-total fill within a couple of iterations once a driving term was added — replaced with a
+        directly controllable growth-front rule where exposed tip cells freeze far more readily than
+        boxed-in infill cells, which is bounded and easy to reason about by construction.
+      Isometric Terrain and Isometric Machinery reuse the existing isometric block-drawing utility
+      Isometric City already established, rather than duplicating it. Verified with the same throwaway
+      determinism harness (312/312 checks across all 39 generators added across Phases 2-5) plus live
+      browser QA of all 10. Remaining phase (6: typographic/optical) is intentionally not started yet.
+
 See per-phase "what shipped" notes in commit history and end-of-phase reports.
