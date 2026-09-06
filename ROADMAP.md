@@ -237,8 +237,7 @@
       the visible canvas (fixed the growth direction); River Network's downhill-gradient signal was
       many orders of magnitude smaller than its meander-jitter term, so rivers degenerated into tight
       jittery scribbles instead of following the terrain (fixed by normalizing the gradient to a unit
-      direction before blending in jitter). Remaining phases (5: reaction/field systems, 6: typographic/
-      optical) are intentionally not started yet.
+      direction before blending in jitter).
 
 - [x] **Advanced generator expansion, Phase 5 of 6 — reaction & field systems**: added 10 generators —
       Reaction Diffusion, Crystalline Cellular System, Displacement Map, Polar Distortion, Spherical
@@ -263,6 +262,30 @@
       Isometric Terrain and Isometric Machinery reuse the existing isometric block-drawing utility
       Isometric City already established, rather than duplicating it. Verified with the same throwaway
       determinism harness (312/312 checks across all 39 generators added across Phases 2-5) plus live
-      browser QA of all 10. Remaining phase (6: typographic/optical) is intentionally not started yet.
+      browser QA of all 10.
+
+- [x] **Advanced generator expansion, Phase 6 of 6 — typographic & optical (final phase)**: added the last
+      10 generators — Parametric Letterform, Glyph Field, Generative Monogram, Procedural Type Tunnel,
+      Mirror Maze, Hyperbolic Grid, Impossible Lattice, Fractal Window, Generative Mosaic Sculpture,
+      Universal Field Sculptor (91 → 101 total, completing the 52 → 101 expansion across all six phases).
+      Added a shared abstract letterform grammar (`engine/math/glyphs.ts`, typed line/arc strokes composed
+      into a glyph and placed/scaled/rotated/mirrored) used by all four type generators instead of four
+      independent implementations — the app's parameter schema has no free-text field, so Generative
+      Monogram substitutes seed-selected abstract "characters" for the spec's user-typed initials, keeping
+      the same visual idea (2-3 overlapping stroke-glyphs) without adding a new parameter type just for one
+      generator. Hyperbolic Grid applies a genuine Poincaré-disk conformal mapping (not a decorative
+      warp); Mirror Maze reflects a real recursive-backtrack maze across its symmetry axes; Impossible
+      Lattice (renamed from the spec's "Penrose-like Optical Space" to avoid confusion with the existing
+      Penrose Tiling generator) tiles Escher-style impossible tribars. Two bugs were caught and fixed before
+      ever running the buggy code: a first draft of `glyphs.ts` transformed raw SVG path strings with regex,
+      which would corrupt arc commands, so it was rewritten to structured typed strokes; and mirroring a
+      glyph by negating its scale produces a 180° point-reflection rather than a left-right mirror, fixed
+      with a proper local-space `mirrorX` reflection. QA also caught a live bug in Universal Field
+      Sculptor: every entry in its "Preset" dropdown matched an entry in the underlying presets table, so
+      the manual "Custom" field/strength controls were permanently unreachable dead controls — fixed by
+      adding a "Custom" preset option with no table entry, which correctly falls through to the manual
+      parameter values. Verified with the same throwaway determinism harness, strengthened to also check
+      determinism and blank-render conditions (392/392 checks across all 49 generators added across Phases
+      2-6) plus live browser QA of all 10. This completes the master-prompt's full 50-generator expansion.
 
 See per-phase "what shipped" notes in commit history and end-of-phase reports.

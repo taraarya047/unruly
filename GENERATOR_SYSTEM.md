@@ -67,8 +67,14 @@ Extracted once several generators needed the same non-trivial algorithm, rather 
   fixed step length in the field's local direction; shared by Vortex Field, Double Vortex, Flow Field
   Sculpture, Curl Noise, and River Network, each of which only needs to supply a different
   `(x,y) => {vx,vy}` function.
+- `glyphs.ts` — a shared abstract letterform grammar: `buildGlyph` composes a small random set of typed
+  strokes (straight lines and arcs — no font, no text rendering), and `placeGlyph` positions/scales/rotates
+  one at a target point, with a `mirrorX` option that reflects in local space before rotation (negating
+  `scale` instead produces a 180° point-reflection, not a left-right mirror — a bug caught before ever
+  running the code). Shared by Parametric Letterform, Glyph Field, Generative Monogram, and Procedural
+  Type Tunnel.
 
-## Generators (91)
+## Generators (101)
 
 **Geometric**: Dot Field, Grid, Circles, Polygon Field, Checker/Tile, Hex Grid.
 **Lines**: Waves, Concentric Lines, Flow Lines, Spiral.
@@ -77,24 +83,24 @@ Barnsley Fern, Fractal Tree Sculpture, Particle Aggregation, Crystal Growth, Lig
 River Network, Organic Vein Network, Reaction Diffusion, Crystalline Cellular System.
 **Experimental**: Confetti, Halftone, Displacement Map.
 **Fields**: Force Field, Magnetic Lines, Gravity Well, Vortex Field, Double Vortex, Flow Field Sculpture,
-Curl Noise.
+Curl Noise, Universal Field Sculptor.
 **Particles**: Particle Constellation, Spiral Galaxy, Particle Collision.
 **Topology**: Voronoi Worlds.
 **Tessellation**: Tile Morpher, Penrose Tiling, Ammann–Beenker Tiling, Hexagonal Tessellation, Triaxial
-Tessellation.
+Tessellation, Generative Mosaic Sculpture.
 **Mathematical**: Delaunay Mesh, String Art, Lorenz Trails, Strange Attractor, Spiral Shell, Orbital System,
 Radial Mandala, Geometric Flower, Radiating Sun, Mandelbrot Landscape, Julia Orbits, Koch Coastline,
 Sierpinski Architecture, Pascal Mosaic, Prime Field, Phyllotaxis, Fibonacci Spiral, Cellular Automata,
 Turing Patterns.
 **Optical**: Kaleidoscope, Impossible Stairs, Moiré, Op Art, Spatial Warp Grid, Polar Distortion,
-Spherical Projection.
+Spherical Projection, Mirror Maze, Hyperbolic Grid, Impossible Lattice.
 **Texture**: Topographic Map, Height Field, Weaving, Pixel Mosaic, Glitch Grid, Vector Field Topography,
 Cracked Earth, Circuit Board.
 **Playful**: Chaos Garden, Doodle Field.
 **Architectural**: Isometric City, Abstract Floorplan, Isometric Terrain, Isometric Machinery,
-Procedural Blueprint.
+Procedural Blueprint, Fractal Window.
 **Illustrative**: Stained Glass, Paper Cut, Ribbon Sculpture, Ink Splash, Magnetic Typography Field,
-Circuit Organism.
+Circuit Organism, Parametric Letterform, Glyph Field, Generative Monogram, Procedural Type Tunnel.
 
 (Some generators carry more than one category tag; the list above groups by primary category, matching the
 generator library sidebar.) Two spec-requested concepts — Halftone and Confetti Party — already matched
@@ -154,9 +160,30 @@ background gain term was added (positive feedback with no counterbalance) — re
 controllable growth-front automaton where tip cells (few frozen neighbors) freeze far more readily than
 infill cells (many frozen neighbors), which is easy to reason about and bounded by construction. Isometric
 Terrain and Isometric Machinery reuse the existing `engine/math/isometric.ts` block-drawing primitive
-Isometric City already established. The remaining phase (6: typographic/optical — see ROADMAP.md) is
-intentionally not implemented yet, per the expansion plan's own instruction not to add all 50 generators
-in one uncontrolled pass.
+Isometric City already established.
+
+**Phase 6** (typographic/optical — Parametric Letterform through Universal Field Sculptor above), the sixth
+and final phase, completes the 50-generator expansion. Its four "type" generators (Parametric Letterform,
+Glyph Field, Generative Monogram, Procedural Type Tunnel) all build on one shared abstract letterform
+grammar (`engine/math/glyphs.ts`) rather than four independent implementations — a real font-rendering
+pipeline is out of scope for an SVG shape generator, so "typography" here means structurally letterform-like
+strokes (arcs and lines composed the way pen strokes build a glyph), not literal characters. Generative
+Monogram is the one deliberate adaptation from the master spec: it calls for building a monogram from
+user-typed initials, but the parameter schema has no free-text type, so it substitutes seed-selected
+abstract "characters" for literal input — same visual idea (2-3 overlapping stroke-glyphs), no text entry
+behind it. Three optical-geometry generators avoid reskinning: Mirror Maze renders a real recursive-backtrack
+maze (not a decorative pattern) reflected across its symmetry axes; Hyperbolic Grid applies a genuine
+Poincaré-disk conformal mapping (`x,y ↦ x·tanh(r·k)/(r·k)`, ditto y) to a Euclidean grid, distinct from
+Spatial Warp Grid's noise-driven point displacement; Impossible Lattice (deliberately renamed from the
+spec's "Penrose-like Optical Space" to avoid confusion with the unrelated Penrose Tiling generator) tiles
+Escher-style impossible tribars, a different illusion family from Impossible Stairs. Fractal Window is
+straightforward recursive nested framing (square/arch/circle/polygon), included as a poster-friendly
+centerpiece. Universal Field Sculptor is the phase's flagship: any two of six named vector fields
+(none/radial/vortex/noise/wave/spiral) combine by direct vector summation, and the combined direction and
+magnitude at each point drive a shape's position, rotation, size, and opacity together — nine presets cover
+common combinations, and a "Custom" preset (added during QA — every preset option originally matched an
+entry in the presets table, so the manual field/strength controls were permanently unreachable dead
+controls) exposes the same mechanism directly.
 
 ## Mutation & evolution
 

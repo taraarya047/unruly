@@ -90,6 +90,16 @@ import { isometricMachineryGenerator } from './isometricMachinery'
 import { proceduralBlueprintGenerator } from './proceduralBlueprint'
 import { circuitBoardGenerator } from './circuitBoard'
 import { circuitOrganismGenerator } from './circuitOrganism'
+import { parametricLetterformGenerator } from './parametricLetterform'
+import { glyphFieldGenerator } from './glyphField'
+import { generativeMonogramGenerator } from './generativeMonogram'
+import { proceduralTypeTunnelGenerator } from './proceduralTypeTunnel'
+import { mirrorMazeGenerator } from './mirrorMaze'
+import { hyperbolicGridGenerator } from './hyperbolicGrid'
+import { impossibleLatticeGenerator } from './impossibleLattice'
+import { fractalWindowGenerator } from './fractalWindow'
+import { generativeMosaicSculptureGenerator } from './generativeMosaicSculpture'
+import { universalFieldSculptorGenerator } from './universalFieldSculptor'
 
 const ALL_GENERATORS = [
   dotFieldGenerator,
@@ -183,6 +193,16 @@ const ALL_GENERATORS = [
   proceduralBlueprintGenerator,
   circuitBoardGenerator,
   circuitOrganismGenerator,
+  parametricLetterformGenerator,
+  glyphFieldGenerator,
+  generativeMonogramGenerator,
+  proceduralTypeTunnelGenerator,
+  mirrorMazeGenerator,
+  hyperbolicGridGenerator,
+  impossibleLatticeGenerator,
+  fractalWindowGenerator,
+  generativeMosaicSculptureGenerator,
+  universalFieldSculptorGenerator,
 ]
 
 export function registerGenerators() {
