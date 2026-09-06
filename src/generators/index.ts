@@ -71,6 +71,15 @@ import { doubleVortexGenerator } from './doubleVortex'
 import { flowFieldSculptureGenerator } from './flowFieldSculpture'
 import { curlNoiseGenerator } from './curlNoise'
 import { vectorFieldTopographyGenerator } from './vectorFieldTopography'
+import { particleCollisionGenerator } from './particleCollision'
+import { particleAggregationGenerator } from './particleAggregation'
+import { crystalGrowthGenerator } from './crystalGrowth'
+import { lightningNetworkGenerator } from './lightningNetwork'
+import { crackedEarthGenerator } from './crackedEarth'
+import { riverNetworkGenerator } from './riverNetwork'
+import { organicVeinNetworkGenerator } from './organicVeinNetwork'
+import { cellularAutomataGenerator } from './cellularAutomata'
+import { turingPatternsGenerator } from './turingPatterns'
 
 const ALL_GENERATORS = [
   dotFieldGenerator,
@@ -145,6 +154,15 @@ const ALL_GENERATORS = [
   flowFieldSculptureGenerator,
   curlNoiseGenerator,
   vectorFieldTopographyGenerator,
+  particleCollisionGenerator,
+  particleAggregationGenerator,
+  crystalGrowthGenerator,
+  lightningNetworkGenerator,
+  crackedEarthGenerator,
+  riverNetworkGenerator,
+  organicVeinNetworkGenerator,
+  cellularAutomataGenerator,
+  turingPatternsGenerator,
 ]
 
 export function registerGenerators() {

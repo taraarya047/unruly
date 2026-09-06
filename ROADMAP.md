@@ -218,4 +218,26 @@
       Remaining phases (4: simulation/growth, 5: reaction/field systems, 6: typographic/optical) are
       intentionally not started yet.
 
+- [x] **Advanced generator expansion, Phase 4 of 6 — simulation & growth**: added 9 generators (10th,
+      "Neural Network", skipped — Particle Constellation's own description already covers it) — Particle
+      Collision, Particle Aggregation, Crystal Growth, Lightning Network, Cracked Earth, River Network,
+      Organic Vein Network, Cellular Automata, Turing Patterns (72 → 81 total). Three distinct growth
+      paradigms rather than one rule reused: real diffusion-limited aggregation (Particle Aggregation),
+      lattice-constrained recursive branching with collision halting (Crystal Growth), and space
+      colonization (Organic Vein Network) — the actual algorithm behind real leaf-venation generative art.
+      Cellular Automata runs a genuine outer-totalistic rule engine (birth/survive sets) forward from a
+      random seed; Turing Patterns is a fast spectral (summed-plane-wave) approximation, deliberately not
+      the full Gray-Scott PDE simulation reserved for a later Reaction Diffusion generator. Verified with
+      the same throwaway determinism harness (232/232 checks across all 29 generators added across Phases
+      2-4) plus live browser QA, which caught three real bugs the harness's shape-count/crash checks alone
+      didn't surface: Particle Aggregation used a fixed spawn radius, so once the cluster grew past it new
+      particles spawned inside the existing structure and stuck immediately, producing a tight ball instead
+      of branching structure (fixed by expanding the spawn ring with the cluster's actual radius); Lightning
+      Network's "lightning" mode started near the top edge but grew *upward*, rendering almost entirely off
+      the visible canvas (fixed the growth direction); River Network's downhill-gradient signal was
+      many orders of magnitude smaller than its meander-jitter term, so rivers degenerated into tight
+      jittery scribbles instead of following the terrain (fixed by normalizing the gradient to a unit
+      direction before blending in jitter). Remaining phases (5: reaction/field systems, 6: typographic/
+      optical) are intentionally not started yet.
+
 See per-phase "what shipped" notes in commit history and end-of-phase reports.

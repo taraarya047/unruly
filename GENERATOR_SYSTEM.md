@@ -65,26 +65,30 @@ Extracted once several generators needed the same non-trivial algorithm, rather 
   function with a different N, not different code.
 - `streamlines.ts` — traces one streamline through a velocity field by forward Euler integration at a
   fixed step length in the field's local direction; shared by Vortex Field, Double Vortex, Flow Field
-  Sculpture, and Curl Noise, each of which only needs to supply a different `(x,y) => {vx,vy}` function.
+  Sculpture, Curl Noise, and River Network, each of which only needs to supply a different
+  `(x,y) => {vx,vy}` function.
 
-## Generators (72)
+## Generators (81)
 
 **Geometric**: Dot Field, Grid, Circles, Polygon Field, Checker/Tile, Hex Grid.
 **Lines**: Waves, Concentric Lines, Flow Lines, Spiral.
 **Organic**: Blobs, Mandala, Metaballs, L-System Forest, Liquid Swirl, Paper Cut, Chaos Garden, Fractal Bloom,
-Barnsley Fern, Fractal Tree Sculpture.
+Barnsley Fern, Fractal Tree Sculpture, Particle Aggregation, Crystal Growth, Lightning Network,
+River Network, Organic Vein Network.
 **Experimental**: Confetti, Halftone.
 **Fields**: Force Field, Magnetic Lines, Gravity Well, Vortex Field, Double Vortex, Flow Field Sculpture,
 Curl Noise.
-**Particles**: Particle Constellation, Spiral Galaxy.
+**Particles**: Particle Constellation, Spiral Galaxy, Particle Collision.
 **Topology**: Voronoi Worlds.
 **Tessellation**: Tile Morpher, Penrose Tiling, Ammann–Beenker Tiling, Hexagonal Tessellation, Triaxial
 Tessellation.
 **Mathematical**: Delaunay Mesh, String Art, Lorenz Trails, Strange Attractor, Spiral Shell, Orbital System,
 Radial Mandala, Geometric Flower, Radiating Sun, Mandelbrot Landscape, Julia Orbits, Koch Coastline,
-Sierpinski Architecture, Pascal Mosaic, Prime Field, Phyllotaxis, Fibonacci Spiral.
+Sierpinski Architecture, Pascal Mosaic, Prime Field, Phyllotaxis, Fibonacci Spiral, Cellular Automata,
+Turing Patterns.
 **Optical**: Kaleidoscope, Impossible Stairs, Moiré, Op Art, Spatial Warp Grid.
-**Texture**: Topographic Map, Height Field, Weaving, Pixel Mosaic, Glitch Grid, Vector Field Topography.
+**Texture**: Topographic Map, Height Field, Weaving, Pixel Mosaic, Glitch Grid, Vector Field Topography,
+Cracked Earth.
 **Playful**: Chaos Garden, Doodle Field.
 **Architectural**: Isometric City, Abstract Floorplan.
 **Illustrative**: Stained Glass, Paper Cut, Ribbon Sculpture, Ink Splash, Magnetic Typography Field.
@@ -92,7 +96,10 @@ Sierpinski Architecture, Pascal Mosaic, Prime Field, Phyllotaxis, Fibonacci Spir
 (Some generators carry more than one category tag; the list above groups by primary category, matching the
 generator library sidebar.) Two spec-requested concepts — Halftone and Confetti Party — already matched
 existing generators (Halftone, Confetti) closely enough that adding near-duplicates would have violated the
-spec's own "if indistinguishable, combine" guidance; they're the same generators, not new ones.
+spec's own "if indistinguishable, combine" guidance; they're the same generators, not new ones. A third —
+"Neural Network" (nodes connected within a radius) — was skipped in Phase 4 for the same reason: Particle
+Constellation's own description already reads "a star map or neural web," so a separate generator would
+have been a near-exact reskin.
 
 **Phase 2 of the advanced-generator expansion** (fractals/mathematics — Mandelbrot Landscape through
 Fibonacci Spiral above) deliberately uses a different technique per generator even where two look
@@ -108,7 +115,24 @@ lines that terminate at the poles; Hexagonal Tessellation warps every cell coher
 noise field (with missing cells and a separate growth field) rather than Hex Grid's per-cell independent
 scale jitter; Curl Noise is specifically the curl of a potential field (guaranteed divergence-free, no
 flow ever converges or diverges anywhere) rather than Force Field's or Flow Field Sculpture's direct
-(unconstrained) noise-driven direction. The remaining phases (simulation/growth, reaction/field systems,
+(unconstrained) noise-driven direction.
+
+**Phase 4** (simulation/growth — Particle Collision through Turing Patterns above) is organized around
+three genuinely distinct growth paradigms rather than one recursive rule reused nine times: Particle
+Aggregation is real diffusion-limited aggregation (particles random-walk in from a boundary and freeze on
+contact — the spawn ring has to expand as the cluster grows, or particles start spawning inside the
+existing structure and stick immediately, producing a tight ball instead of branching); Crystal Growth is
+direct recursive branching constrained to lattice-angle turns with collision-based halting (distinct from
+both DLA's random-walk process and Fractal Tree Sculpture's smooth taper/gravity/wind); Organic Vein
+Network is space colonization (Runions et al.) — branches grow toward a field of attraction points that
+get consumed on contact, an emergent-from-data-layout paradigm unrelated to any recursive rule. River
+Network reuses the streamline tracer from Phase 3, but follows a height field's downhill gradient rather
+than an arbitrary vector field — its raw gradient magnitude is tiny relative to the meander-jitter term
+(a real bug caught in QA), so the gradient is normalized to a unit direction before jitter is blended in,
+or the jitter completely swamps the terrain-following signal. Turing Patterns is a fast, one-shot spectral
+approximation (summed plane waves at one shared wavelength, thresholded into contours) — a real
+Gray-Scott reaction-diffusion PDE simulation is reserved for a later Reaction Diffusion generator, since
+the master spec asks for both as separate generators. The remaining phases (reaction/field systems,
 typographic/optical — see ROADMAP.md) are intentionally not implemented yet, per the expansion plan's own
 instruction not to add all 50 generators in one uncontrolled pass.
 
