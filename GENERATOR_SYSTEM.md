@@ -50,23 +50,31 @@ Extracted once several generators needed the same non-trivial algorithm, rather 
 - `voronoi.ts` — Voronoi cells via half-plane intersection (independent of the Delaunay dual, for robustness)
 - `marchingSquares.ts` — scalar-field contour extraction; `sampleGrid`/`marchingSquaresFromGrid` split the
   (expensive) field sampling from the (cheap) per-threshold contour pass so a many-contour generator samples
-  the field once, not once per contour — see Topographic Map
+  the field once, not once per contour — see Topographic Map. `gridValueRange` returns the sampled field's
+  actual min/max, which Mandelbrot Landscape and Julia Orbits use to place contour thresholds strictly
+  within the field's observed range — a fixed guess can miss escape-time fields entirely at extreme
+  zoom/iteration combinations, rendering nothing.
 - `lsystem.ts` — L-system string rewriting + turtle-graphics interpreter, with presets (tree/fern/coral/...)
 - `attractors.ts` — Lorenz/Clifford/De Jong chaotic systems
 - `isometric.ts` — isometric axis vectors + a shaded 3-face box primitive (Isometric City, Impossible Stairs)
+- `complexEscape.ts` — shared z² + c escape-time iteration for Mandelbrot Landscape (c varies per pixel,
+  z0 = 0) and Julia Orbits (c fixed, z0 varies per pixel) — the two fractals differ only in which value is
+  swept across the plane, so the math lives in exactly one place.
 
-## Generators (52)
+## Generators (62)
 
 **Geometric**: Dot Field, Grid, Circles, Polygon Field, Checker/Tile, Hex Grid.
 **Lines**: Waves, Concentric Lines, Flow Lines, Spiral.
-**Organic**: Blobs, Mandala, Metaballs, L-System Forest, Liquid Swirl, Paper Cut, Chaos Garden, Fractal Bloom.
+**Organic**: Blobs, Mandala, Metaballs, L-System Forest, Liquid Swirl, Paper Cut, Chaos Garden, Fractal Bloom,
+Barnsley Fern, Fractal Tree Sculpture.
 **Experimental**: Confetti, Halftone.
 **Fields**: Force Field, Magnetic Lines, Gravity Well.
 **Particles**: Particle Constellation, Spiral Galaxy.
 **Topology**: Voronoi Worlds.
 **Tessellation**: Tile Morpher.
 **Mathematical**: Delaunay Mesh, String Art, Lorenz Trails, Strange Attractor, Spiral Shell, Orbital System,
-Radial Mandala, Geometric Flower, Radiating Sun.
+Radial Mandala, Geometric Flower, Radiating Sun, Mandelbrot Landscape, Julia Orbits, Koch Coastline,
+Sierpinski Architecture, Pascal Mosaic, Prime Field, Phyllotaxis, Fibonacci Spiral.
 **Optical**: Kaleidoscope, Impossible Stairs, Moiré, Op Art.
 **Texture**: Topographic Map, Height Field, Weaving, Pixel Mosaic, Glitch Grid.
 **Playful**: Chaos Garden, Doodle Field.
@@ -77,6 +85,15 @@ Radial Mandala, Geometric Flower, Radiating Sun.
 generator library sidebar.) Two spec-requested concepts — Halftone and Confetti Party — already matched
 existing generators (Halftone, Confetti) closely enough that adding near-duplicates would have violated the
 spec's own "if indistinguishable, combine" guidance; they're the same generators, not new ones.
+
+**Phase 2 of the advanced-generator expansion** (fractals/mathematics — Mandelbrot Landscape through
+Fibonacci Spiral above) deliberately uses a different technique per generator even where two look
+superficially similar to an existing one: Fractal Tree Sculpture is direct recursive branch-drawing
+(taper/gravity/wind computed per segment), genuinely distinct from L-System Forest's grammar rewriting +
+turtle interpretation; Barnsley Fern is an iterated function system (four affine maps, weighted-random
+selection), unrelated to either. The remaining phases (tiling/geometry, simulation/growth, reaction/field
+systems, typographic/optical — see ROADMAP.md) are intentionally not implemented yet, per the expansion
+plan's own instruction not to add all 50 generators in one uncontrolled pass.
 
 ## Mutation & evolution
 

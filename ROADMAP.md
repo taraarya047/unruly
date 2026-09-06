@@ -172,4 +172,30 @@
       runs JS, so this works despite no SSR). The larger §70 ask — indexable landing pages per generator
       type (`/svg-pattern-generator` etc.) — remains a distinct, larger follow-up, not attempted here.
 
+- [x] **Advanced generator expansion, Phase 2 of 6 — fractals & mathematics** (user-requested 50-generator
+      expansion, delivered in the phases the request's own spec demanded rather than all at once): added 10
+      generators — Mandelbrot Landscape, Julia Orbits, Barnsley Fern, Fractal Tree Sculpture, Koch
+      Coastline, Sierpinski Architecture, Pascal Mosaic, Prime Field, Phyllotaxis, Fibonacci Spiral (52 → 62
+      total; see GENERATOR_SYSTEM.md for category placement and why each is a genuinely distinct technique,
+      not a reskin of an existing generator). No architecture changes were needed — the existing
+      `GeneratorDefinition`/`ParameterSchema` contract (group + `semantic` tags) already drives mutation,
+      evolution, search, thumbnails, export, and Figma copy generically, so "add a generator" really did
+      mean just writing `generate()` correctly. One new shared utility: `engine/math/complexEscape.ts`
+      (the z²+c iteration both fractals share). Verified with a throwaway seed/min/max/random ×
+      determinism harness (not checked into the repo — no test runner exists in this project yet, so this
+      was a one-off `tsx` script) covering all 10 generators × 8 parameter combinations each, 80/80 passing,
+      plus live visual QA in the browser. That QA caught two real bugs a passing test suite alone would have
+      missed: Sierpinski Architecture's "Rotation" control was spinning each grid cell in place instead of
+      rotating the whole composition (fixed by rotating the seed points/corners around canvas center before
+      recursing, not each shape's own center); and Fibonacci Spiral's square-tiling used a plain geometric
+      sequence that only tiles edge-to-edge at the exact golden ratio, producing disconnected fragments at
+      any other "growth rate" value (fixed by switching to the true additive Fibonacci recurrence, which
+      tiles perfectly for any seed ratio, and by anchoring the logarithmic-spiral curve to a fixed
+      canvas-center radius instead of deriving it from that tiling's bounds). Also added `gridValueRange()`
+      to `marchingSquares.ts` so Mandelbrot/Julia contour thresholds are placed within the field's actual
+      observed range — a fixed guess could render blank at extreme zoom/iteration combinations.
+      Remaining phases (3: tiling/geometry — Penrose, vortex/flow fields; 4: simulation/growth — DLA,
+      crystal growth, cellular automata; 5: reaction/field systems — reaction-diffusion, circuit organism;
+      6: typographic/optical — glyph field, Universal Field Sculptor) are intentionally not started yet.
+
 See per-phase "what shipped" notes in commit history and end-of-phase reports.

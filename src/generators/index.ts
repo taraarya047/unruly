@@ -51,6 +51,16 @@ import { ribbonSculptureGenerator } from './ribbonSculpture'
 import { inkSplashGenerator } from './inkSplash'
 import { doodleFieldGenerator } from './doodleField'
 import { magneticTypographyGenerator } from './magneticTypography'
+import { mandelbrotLandscapeGenerator } from './mandelbrotLandscape'
+import { juliaOrbitsGenerator } from './juliaOrbits'
+import { barnsleyFernGenerator } from './barnsleyFern'
+import { fractalTreeSculptureGenerator } from './fractalTreeSculpture'
+import { kochCoastlineGenerator } from './kochCoastline'
+import { sierpinskiArchitectureGenerator } from './sierpinskiArchitecture'
+import { pascalMosaicGenerator } from './pascalMosaic'
+import { primeFieldGenerator } from './primeField'
+import { phyllotaxisGenerator } from './phyllotaxis'
+import { fibonacciSpiralGenerator } from './fibonacciSpiral'
 
 const ALL_GENERATORS = [
   dotFieldGenerator,
@@ -105,6 +115,16 @@ const ALL_GENERATORS = [
   inkSplashGenerator,
   doodleFieldGenerator,
   magneticTypographyGenerator,
+  mandelbrotLandscapeGenerator,
+  juliaOrbitsGenerator,
+  barnsleyFernGenerator,
+  fractalTreeSculptureGenerator,
+  kochCoastlineGenerator,
+  sierpinskiArchitectureGenerator,
+  pascalMosaicGenerator,
+  primeFieldGenerator,
+  phyllotaxisGenerator,
+  fibonacciSpiralGenerator,
 ]
 
 export function registerGenerators() {
