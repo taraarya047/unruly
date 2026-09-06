@@ -172,4 +172,120 @@
       runs JS, so this works despite no SSR). The larger §70 ask — indexable landing pages per generator
       type (`/svg-pattern-generator` etc.) — remains a distinct, larger follow-up, not attempted here.
 
+- [x] **Advanced generator expansion, Phase 2 of 6 — fractals & mathematics** (user-requested 50-generator
+      expansion, delivered in the phases the request's own spec demanded rather than all at once): added 10
+      generators — Mandelbrot Landscape, Julia Orbits, Barnsley Fern, Fractal Tree Sculpture, Koch
+      Coastline, Sierpinski Architecture, Pascal Mosaic, Prime Field, Phyllotaxis, Fibonacci Spiral (52 → 62
+      total; see GENERATOR_SYSTEM.md for category placement and why each is a genuinely distinct technique,
+      not a reskin of an existing generator). No architecture changes were needed — the existing
+      `GeneratorDefinition`/`ParameterSchema` contract (group + `semantic` tags) already drives mutation,
+      evolution, search, thumbnails, export, and Figma copy generically, so "add a generator" really did
+      mean just writing `generate()` correctly. One new shared utility: `engine/math/complexEscape.ts`
+      (the z²+c iteration both fractals share). Verified with a throwaway seed/min/max/random ×
+      determinism harness (not checked into the repo — no test runner exists in this project yet, so this
+      was a one-off `tsx` script) covering all 10 generators × 8 parameter combinations each, 80/80 passing,
+      plus live visual QA in the browser. That QA caught two real bugs a passing test suite alone would have
+      missed: Sierpinski Architecture's "Rotation" control was spinning each grid cell in place instead of
+      rotating the whole composition (fixed by rotating the seed points/corners around canvas center before
+      recursing, not each shape's own center); and Fibonacci Spiral's square-tiling used a plain geometric
+      sequence that only tiles edge-to-edge at the exact golden ratio, producing disconnected fragments at
+      any other "growth rate" value (fixed by switching to the true additive Fibonacci recurrence, which
+      tiles perfectly for any seed ratio, and by anchoring the logarithmic-spiral curve to a fixed
+      canvas-center radius instead of deriving it from that tiling's bounds). Also added `gridValueRange()`
+      to `marchingSquares.ts` so Mandelbrot/Julia contour thresholds are placed within the field's actual
+      observed range — a fixed guess could render blank at extreme zoom/iteration combinations.
+      Remaining phases (3: tiling/geometry — Penrose, vortex/flow fields; 4: simulation/growth — DLA,
+      crystal growth, cellular automata; 5: reaction/field systems — reaction-diffusion, circuit organism;
+      6: typographic/optical — glyph field, Universal Field Sculptor) are intentionally not started yet.
+
+- [x] **Advanced generator expansion, Phase 3 of 6 — tiling & geometry**: added 10 generators — Penrose
+      Tiling, Ammann–Beenker Tiling, Hexagonal Tessellation, Triaxial Tessellation, Spatial Warp Grid,
+      Vortex Field, Double Vortex, Flow Field Sculpture, Curl Noise, Vector Field Topography (62 → 72
+      total). Two new shared utilities: `engine/math/multigrid.ts` (De Bruijn's N-line grid dualization —
+      Penrose and Ammann–Beenker are the same function called with N=5 vs N=4, not separate
+      implementations) and `engine/math/streamlines.ts` (forward-Euler streamline tracing through a
+      velocity field, shared by the four flow-based generators — each supplies its own `(x,y)=>{vx,vy}`).
+      Deliberately avoided reskinning existing "fields" generators: Vortex Field is pure rotation with no
+      source/sink (unlike Gravity Well's radial pull or Magnetic Lines' dipole field lines that terminate
+      at the poles), Curl Noise is specifically divergence-free (the curl of a potential field) rather
+      than Force Field's direct, unconstrained noise-driven direction, and Hexagonal Tessellation warps
+      every cell through a shared coherent noise field (plus a separate growth field and missing cells)
+      rather than Hex Grid's independent per-cell jitter. Verified with the same throwaway determinism
+      harness used for Phase 2 (160/160 checks passing across all 20 generators added so far) plus live
+      browser QA, which caught one real naming issue: Double Vortex's "Saddle" mode produced correct,
+      deterministic flow but read visually as convergence toward a single point, not a classic hyperbolic
+      saddle — relabeled to "Convergent" rather than leave a mode whose output didn't match its name.
+      Remaining phases (4: simulation/growth, 5: reaction/field systems, 6: typographic/optical) are
+      intentionally not started yet.
+
+- [x] **Advanced generator expansion, Phase 4 of 6 — simulation & growth**: added 9 generators (10th,
+      "Neural Network", skipped — Particle Constellation's own description already covers it) — Particle
+      Collision, Particle Aggregation, Crystal Growth, Lightning Network, Cracked Earth, River Network,
+      Organic Vein Network, Cellular Automata, Turing Patterns (72 → 81 total). Three distinct growth
+      paradigms rather than one rule reused: real diffusion-limited aggregation (Particle Aggregation),
+      lattice-constrained recursive branching with collision halting (Crystal Growth), and space
+      colonization (Organic Vein Network) — the actual algorithm behind real leaf-venation generative art.
+      Cellular Automata runs a genuine outer-totalistic rule engine (birth/survive sets) forward from a
+      random seed; Turing Patterns is a fast spectral (summed-plane-wave) approximation, deliberately not
+      the full Gray-Scott PDE simulation reserved for a later Reaction Diffusion generator. Verified with
+      the same throwaway determinism harness (232/232 checks across all 29 generators added across Phases
+      2-4) plus live browser QA, which caught three real bugs the harness's shape-count/crash checks alone
+      didn't surface: Particle Aggregation used a fixed spawn radius, so once the cluster grew past it new
+      particles spawned inside the existing structure and stuck immediately, producing a tight ball instead
+      of branching structure (fixed by expanding the spawn ring with the cluster's actual radius); Lightning
+      Network's "lightning" mode started near the top edge but grew *upward*, rendering almost entirely off
+      the visible canvas (fixed the growth direction); River Network's downhill-gradient signal was
+      many orders of magnitude smaller than its meander-jitter term, so rivers degenerated into tight
+      jittery scribbles instead of following the terrain (fixed by normalizing the gradient to a unit
+      direction before blending in jitter).
+
+- [x] **Advanced generator expansion, Phase 5 of 6 — reaction & field systems**: added 10 generators —
+      Reaction Diffusion, Crystalline Cellular System, Displacement Map, Polar Distortion, Spherical
+      Projection, Isometric Terrain, Isometric Machinery, Procedural Blueprint, Circuit Board, Circuit
+      Organism (81 → 91 total). Reaction Diffusion is a genuine iterative Gray-Scott simulation (the
+      Turing Patterns spectral approximation from Phase 4 was deliberately not this). Two grid-simulation
+      generators needed real debugging beyond what the determinism harness alone caught:
+      - Reaction Diffusion initially blew up to NaN within dozens of steps — the commonly *quoted*
+        Du=1/Dv=0.5 diffusion rates are unconditionally unstable at dt=1 with a 5-point discrete
+        Laplacian; fixed with the actual Pearson (1993) rates (Du=0.16/Dv=0.08). It also rendered blank
+        for some feed/kill presets (a fixed contour threshold sat outside that preset's actual
+        concentration range) — fixed the same way as Mandelbrot/Julia's earlier threshold fix, by
+        thresholding within the field's own observed min/max. The same threshold-range bug turned up in
+        Turing Patterns' user-facing "Threshold" slider once the test harness was strengthened to check
+        for empty path data instead of trusting a non-zero shape count (a design that had 1 "shape" whose
+        path `d` was an empty string was passing every prior check).
+      - Crystalline Cellular System's first implementation (a diffusion-based vapor model, adapted from
+        Reiter's snowflake automaton) either never grew past its single seed cell or avalanched to
+        near-total fill within a couple of iterations once a driving term was added — replaced with a
+        directly controllable growth-front rule where exposed tip cells freeze far more readily than
+        boxed-in infill cells, which is bounded and easy to reason about by construction.
+      Isometric Terrain and Isometric Machinery reuse the existing isometric block-drawing utility
+      Isometric City already established, rather than duplicating it. Verified with the same throwaway
+      determinism harness (312/312 checks across all 39 generators added across Phases 2-5) plus live
+      browser QA of all 10.
+
+- [x] **Advanced generator expansion, Phase 6 of 6 — typographic & optical (final phase)**: added the last
+      10 generators — Parametric Letterform, Glyph Field, Generative Monogram, Procedural Type Tunnel,
+      Mirror Maze, Hyperbolic Grid, Impossible Lattice, Fractal Window, Generative Mosaic Sculpture,
+      Universal Field Sculptor (91 → 101 total, completing the 52 → 101 expansion across all six phases).
+      Added a shared abstract letterform grammar (`engine/math/glyphs.ts`, typed line/arc strokes composed
+      into a glyph and placed/scaled/rotated/mirrored) used by all four type generators instead of four
+      independent implementations — the app's parameter schema has no free-text field, so Generative
+      Monogram substitutes seed-selected abstract "characters" for the spec's user-typed initials, keeping
+      the same visual idea (2-3 overlapping stroke-glyphs) without adding a new parameter type just for one
+      generator. Hyperbolic Grid applies a genuine Poincaré-disk conformal mapping (not a decorative
+      warp); Mirror Maze reflects a real recursive-backtrack maze across its symmetry axes; Impossible
+      Lattice (renamed from the spec's "Penrose-like Optical Space" to avoid confusion with the existing
+      Penrose Tiling generator) tiles Escher-style impossible tribars. Two bugs were caught and fixed before
+      ever running the buggy code: a first draft of `glyphs.ts` transformed raw SVG path strings with regex,
+      which would corrupt arc commands, so it was rewritten to structured typed strokes; and mirroring a
+      glyph by negating its scale produces a 180° point-reflection rather than a left-right mirror, fixed
+      with a proper local-space `mirrorX` reflection. QA also caught a live bug in Universal Field
+      Sculptor: every entry in its "Preset" dropdown matched an entry in the underlying presets table, so
+      the manual "Custom" field/strength controls were permanently unreachable dead controls — fixed by
+      adding a "Custom" preset option with no table entry, which correctly falls through to the manual
+      parameter values. Verified with the same throwaway determinism harness, strengthened to also check
+      determinism and blank-render conditions (392/392 checks across all 49 generators added across Phases
+      2-6) plus live browser QA of all 10. This completes the master-prompt's full 50-generator expansion.
+
 See per-phase "what shipped" notes in commit history and end-of-phase reports.

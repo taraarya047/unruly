@@ -51,6 +51,55 @@ import { ribbonSculptureGenerator } from './ribbonSculpture'
 import { inkSplashGenerator } from './inkSplash'
 import { doodleFieldGenerator } from './doodleField'
 import { magneticTypographyGenerator } from './magneticTypography'
+import { mandelbrotLandscapeGenerator } from './mandelbrotLandscape'
+import { juliaOrbitsGenerator } from './juliaOrbits'
+import { barnsleyFernGenerator } from './barnsleyFern'
+import { fractalTreeSculptureGenerator } from './fractalTreeSculpture'
+import { kochCoastlineGenerator } from './kochCoastline'
+import { sierpinskiArchitectureGenerator } from './sierpinskiArchitecture'
+import { pascalMosaicGenerator } from './pascalMosaic'
+import { primeFieldGenerator } from './primeField'
+import { phyllotaxisGenerator } from './phyllotaxis'
+import { fibonacciSpiralGenerator } from './fibonacciSpiral'
+import { penroseTilingGenerator } from './penroseTiling'
+import { ammannBeenkerTilingGenerator } from './ammannBeenkerTiling'
+import { hexagonalTessellationGenerator } from './hexagonalTessellation'
+import { triaxialTessellationGenerator } from './triaxialTessellation'
+import { spatialWarpGridGenerator } from './spatialWarpGrid'
+import { vortexFieldGenerator } from './vortexField'
+import { doubleVortexGenerator } from './doubleVortex'
+import { flowFieldSculptureGenerator } from './flowFieldSculpture'
+import { curlNoiseGenerator } from './curlNoise'
+import { vectorFieldTopographyGenerator } from './vectorFieldTopography'
+import { particleCollisionGenerator } from './particleCollision'
+import { particleAggregationGenerator } from './particleAggregation'
+import { crystalGrowthGenerator } from './crystalGrowth'
+import { lightningNetworkGenerator } from './lightningNetwork'
+import { crackedEarthGenerator } from './crackedEarth'
+import { riverNetworkGenerator } from './riverNetwork'
+import { organicVeinNetworkGenerator } from './organicVeinNetwork'
+import { cellularAutomataGenerator } from './cellularAutomata'
+import { turingPatternsGenerator } from './turingPatterns'
+import { reactionDiffusionGenerator } from './reactionDiffusion'
+import { crystallineCellularSystemGenerator } from './crystallineCellularSystem'
+import { displacementMapGenerator } from './displacementMap'
+import { polarDistortionGenerator } from './polarDistortion'
+import { sphericalProjectionGenerator } from './sphericalProjection'
+import { isometricTerrainGenerator } from './isometricTerrain'
+import { isometricMachineryGenerator } from './isometricMachinery'
+import { proceduralBlueprintGenerator } from './proceduralBlueprint'
+import { circuitBoardGenerator } from './circuitBoard'
+import { circuitOrganismGenerator } from './circuitOrganism'
+import { parametricLetterformGenerator } from './parametricLetterform'
+import { glyphFieldGenerator } from './glyphField'
+import { generativeMonogramGenerator } from './generativeMonogram'
+import { proceduralTypeTunnelGenerator } from './proceduralTypeTunnel'
+import { mirrorMazeGenerator } from './mirrorMaze'
+import { hyperbolicGridGenerator } from './hyperbolicGrid'
+import { impossibleLatticeGenerator } from './impossibleLattice'
+import { fractalWindowGenerator } from './fractalWindow'
+import { generativeMosaicSculptureGenerator } from './generativeMosaicSculpture'
+import { universalFieldSculptorGenerator } from './universalFieldSculptor'
 
 const ALL_GENERATORS = [
   dotFieldGenerator,
@@ -105,6 +154,55 @@ const ALL_GENERATORS = [
   inkSplashGenerator,
   doodleFieldGenerator,
   magneticTypographyGenerator,
+  mandelbrotLandscapeGenerator,
+  juliaOrbitsGenerator,
+  barnsleyFernGenerator,
+  fractalTreeSculptureGenerator,
+  kochCoastlineGenerator,
+  sierpinskiArchitectureGenerator,
+  pascalMosaicGenerator,
+  primeFieldGenerator,
+  phyllotaxisGenerator,
+  fibonacciSpiralGenerator,
+  penroseTilingGenerator,
+  ammannBeenkerTilingGenerator,
+  hexagonalTessellationGenerator,
+  triaxialTessellationGenerator,
+  spatialWarpGridGenerator,
+  vortexFieldGenerator,
+  doubleVortexGenerator,
+  flowFieldSculptureGenerator,
+  curlNoiseGenerator,
+  vectorFieldTopographyGenerator,
+  particleCollisionGenerator,
+  particleAggregationGenerator,
+  crystalGrowthGenerator,
+  lightningNetworkGenerator,
+  crackedEarthGenerator,
+  riverNetworkGenerator,
+  organicVeinNetworkGenerator,
+  cellularAutomataGenerator,
+  turingPatternsGenerator,
+  reactionDiffusionGenerator,
+  crystallineCellularSystemGenerator,
+  displacementMapGenerator,
+  polarDistortionGenerator,
+  sphericalProjectionGenerator,
+  isometricTerrainGenerator,
+  isometricMachineryGenerator,
+  proceduralBlueprintGenerator,
+  circuitBoardGenerator,
+  circuitOrganismGenerator,
+  parametricLetterformGenerator,
+  glyphFieldGenerator,
+  generativeMonogramGenerator,
+  proceduralTypeTunnelGenerator,
+  mirrorMazeGenerator,
+  hyperbolicGridGenerator,
+  impossibleLatticeGenerator,
+  fractalWindowGenerator,
+  generativeMosaicSculptureGenerator,
+  universalFieldSculptorGenerator,
 ]
 
 export function registerGenerators() {

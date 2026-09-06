@@ -84,6 +84,23 @@ export function marchingSquaresFromGrid(grid: SampledGrid, threshold: number): S
   return segments
 }
 
+/**
+ * The actual min/max sampled values — spacing contour thresholds strictly between these (never at the
+ * extremes, which produce zero crossings) is what keeps escape-time fractals from rendering blank at
+ * extreme zoom/iteration combinations where a naive fixed threshold range misses the field entirely.
+ */
+export function gridValueRange(grid: SampledGrid): { min: number; max: number } {
+  let min = Infinity
+  let max = -Infinity
+  for (const row of grid.values) {
+    for (const v of row) {
+      if (v < min) min = v
+      if (v > max) max = v
+    }
+  }
+  return { min, max }
+}
+
 /** Convenience one-shot version for callers that only need a single threshold. */
 export function marchingSquares(field: (x: number, y: number) => number, width: number, height: number, resolution: number, threshold: number): Segment[] {
   return marchingSquaresFromGrid(sampleGrid(field, width, height, resolution), threshold)
