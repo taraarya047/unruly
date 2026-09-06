@@ -198,4 +198,24 @@
       crystal growth, cellular automata; 5: reaction/field systems — reaction-diffusion, circuit organism;
       6: typographic/optical — glyph field, Universal Field Sculptor) are intentionally not started yet.
 
+- [x] **Advanced generator expansion, Phase 3 of 6 — tiling & geometry**: added 10 generators — Penrose
+      Tiling, Ammann–Beenker Tiling, Hexagonal Tessellation, Triaxial Tessellation, Spatial Warp Grid,
+      Vortex Field, Double Vortex, Flow Field Sculpture, Curl Noise, Vector Field Topography (62 → 72
+      total). Two new shared utilities: `engine/math/multigrid.ts` (De Bruijn's N-line grid dualization —
+      Penrose and Ammann–Beenker are the same function called with N=5 vs N=4, not separate
+      implementations) and `engine/math/streamlines.ts` (forward-Euler streamline tracing through a
+      velocity field, shared by the four flow-based generators — each supplies its own `(x,y)=>{vx,vy}`).
+      Deliberately avoided reskinning existing "fields" generators: Vortex Field is pure rotation with no
+      source/sink (unlike Gravity Well's radial pull or Magnetic Lines' dipole field lines that terminate
+      at the poles), Curl Noise is specifically divergence-free (the curl of a potential field) rather
+      than Force Field's direct, unconstrained noise-driven direction, and Hexagonal Tessellation warps
+      every cell through a shared coherent noise field (plus a separate growth field and missing cells)
+      rather than Hex Grid's independent per-cell jitter. Verified with the same throwaway determinism
+      harness used for Phase 2 (160/160 checks passing across all 20 generators added so far) plus live
+      browser QA, which caught one real naming issue: Double Vortex's "Saddle" mode produced correct,
+      deterministic flow but read visually as convergence toward a single point, not a classic hyperbolic
+      saddle — relabeled to "Convergent" rather than leave a mode whose output didn't match its name.
+      Remaining phases (4: simulation/growth, 5: reaction/field systems, 6: typographic/optical) are
+      intentionally not started yet.
+
 See per-phase "what shipped" notes in commit history and end-of-phase reports.

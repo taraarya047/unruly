@@ -60,23 +60,31 @@ Extracted once several generators needed the same non-trivial algorithm, rather 
 - `complexEscape.ts` — shared z² + c escape-time iteration for Mandelbrot Landscape (c varies per pixel,
   z0 = 0) and Julia Orbits (c fixed, z0 varies per pixel) — the two fractals differ only in which value is
   swept across the plane, so the math lives in exactly one place.
+- `multigrid.ts` — De Bruijn's N-line multigrid dualization, the algebraic (non-recursive) method for
+  building N-fold quasiperiodic rhombus tilings: Penrose (N=5) and Ammann–Beenker (N=4) are the same
+  function with a different N, not different code.
+- `streamlines.ts` — traces one streamline through a velocity field by forward Euler integration at a
+  fixed step length in the field's local direction; shared by Vortex Field, Double Vortex, Flow Field
+  Sculpture, and Curl Noise, each of which only needs to supply a different `(x,y) => {vx,vy}` function.
 
-## Generators (62)
+## Generators (72)
 
 **Geometric**: Dot Field, Grid, Circles, Polygon Field, Checker/Tile, Hex Grid.
 **Lines**: Waves, Concentric Lines, Flow Lines, Spiral.
 **Organic**: Blobs, Mandala, Metaballs, L-System Forest, Liquid Swirl, Paper Cut, Chaos Garden, Fractal Bloom,
 Barnsley Fern, Fractal Tree Sculpture.
 **Experimental**: Confetti, Halftone.
-**Fields**: Force Field, Magnetic Lines, Gravity Well.
+**Fields**: Force Field, Magnetic Lines, Gravity Well, Vortex Field, Double Vortex, Flow Field Sculpture,
+Curl Noise.
 **Particles**: Particle Constellation, Spiral Galaxy.
 **Topology**: Voronoi Worlds.
-**Tessellation**: Tile Morpher.
+**Tessellation**: Tile Morpher, Penrose Tiling, Ammann–Beenker Tiling, Hexagonal Tessellation, Triaxial
+Tessellation.
 **Mathematical**: Delaunay Mesh, String Art, Lorenz Trails, Strange Attractor, Spiral Shell, Orbital System,
 Radial Mandala, Geometric Flower, Radiating Sun, Mandelbrot Landscape, Julia Orbits, Koch Coastline,
 Sierpinski Architecture, Pascal Mosaic, Prime Field, Phyllotaxis, Fibonacci Spiral.
-**Optical**: Kaleidoscope, Impossible Stairs, Moiré, Op Art.
-**Texture**: Topographic Map, Height Field, Weaving, Pixel Mosaic, Glitch Grid.
+**Optical**: Kaleidoscope, Impossible Stairs, Moiré, Op Art, Spatial Warp Grid.
+**Texture**: Topographic Map, Height Field, Weaving, Pixel Mosaic, Glitch Grid, Vector Field Topography.
 **Playful**: Chaos Garden, Doodle Field.
 **Architectural**: Isometric City, Abstract Floorplan.
 **Illustrative**: Stained Glass, Paper Cut, Ribbon Sculpture, Ink Splash, Magnetic Typography Field.
@@ -91,9 +99,18 @@ Fibonacci Spiral above) deliberately uses a different technique per generator ev
 superficially similar to an existing one: Fractal Tree Sculpture is direct recursive branch-drawing
 (taper/gravity/wind computed per segment), genuinely distinct from L-System Forest's grammar rewriting +
 turtle interpretation; Barnsley Fern is an iterated function system (four affine maps, weighted-random
-selection), unrelated to either. The remaining phases (tiling/geometry, simulation/growth, reaction/field
-systems, typographic/optical — see ROADMAP.md) are intentionally not implemented yet, per the expansion
-plan's own instruction not to add all 50 generators in one uncontrolled pass.
+selection), unrelated to either.
+
+**Phase 3** (tiling/geometry — Penrose Tiling through Vector Field Topography above) similarly avoids
+reskinning what already existed: Vortex Field is a pure rotational field (streamlines circulate forever,
+no source or sink), unlike Gravity Well's radial-attraction-plus-spiral or Magnetic Lines' dipole field
+lines that terminate at the poles; Hexagonal Tessellation warps every cell coherently through a shared
+noise field (with missing cells and a separate growth field) rather than Hex Grid's per-cell independent
+scale jitter; Curl Noise is specifically the curl of a potential field (guaranteed divergence-free, no
+flow ever converges or diverges anywhere) rather than Force Field's or Flow Field Sculpture's direct
+(unconstrained) noise-driven direction. The remaining phases (simulation/growth, reaction/field systems,
+typographic/optical — see ROADMAP.md) are intentionally not implemented yet, per the expansion plan's own
+instruction not to add all 50 generators in one uncontrolled pass.
 
 ## Mutation & evolution
 

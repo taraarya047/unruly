@@ -61,6 +61,16 @@ import { pascalMosaicGenerator } from './pascalMosaic'
 import { primeFieldGenerator } from './primeField'
 import { phyllotaxisGenerator } from './phyllotaxis'
 import { fibonacciSpiralGenerator } from './fibonacciSpiral'
+import { penroseTilingGenerator } from './penroseTiling'
+import { ammannBeenkerTilingGenerator } from './ammannBeenkerTiling'
+import { hexagonalTessellationGenerator } from './hexagonalTessellation'
+import { triaxialTessellationGenerator } from './triaxialTessellation'
+import { spatialWarpGridGenerator } from './spatialWarpGrid'
+import { vortexFieldGenerator } from './vortexField'
+import { doubleVortexGenerator } from './doubleVortex'
+import { flowFieldSculptureGenerator } from './flowFieldSculpture'
+import { curlNoiseGenerator } from './curlNoise'
+import { vectorFieldTopographyGenerator } from './vectorFieldTopography'
 
 const ALL_GENERATORS = [
   dotFieldGenerator,
@@ -125,6 +135,16 @@ const ALL_GENERATORS = [
   primeFieldGenerator,
   phyllotaxisGenerator,
   fibonacciSpiralGenerator,
+  penroseTilingGenerator,
+  ammannBeenkerTilingGenerator,
+  hexagonalTessellationGenerator,
+  triaxialTessellationGenerator,
+  spatialWarpGridGenerator,
+  vortexFieldGenerator,
+  doubleVortexGenerator,
+  flowFieldSculptureGenerator,
+  curlNoiseGenerator,
+  vectorFieldTopographyGenerator,
 ]
 
 export function registerGenerators() {
